@@ -16,7 +16,7 @@ if [ -f ./.envrc ]; then source ./.envrc; fi
 
 if [ ! -z $1 ]; then INITIALS=$1; fi
 if [ -z $INITIALS ]; then
-  INITIALS="tsp"
+  INITIALS="demo"
 fi
 
 if [ -z $AZURE_LOCATION ]; then
@@ -117,7 +117,7 @@ function CreateSSHKeys() {
    echo $_result
 }
 
-function AcceptT&C() {
+function AcceptTC() {
   if [ -z $1 ]; then
       tput setaf 1; echo 'ERROR: Argument $1 (OFFER) not received'; tput sgr0
       exit 1;
@@ -138,9 +138,9 @@ RESOURCE_GROUP="$INITIALS-swarm"
 CreateResourceGroup $RESOURCE_GROUP $AZURE_LOCATION
 
 
-tput setaf 2; echo 'Creating Service Principal and Role Assignment...' ; tput sgr0
-PRINCIPAL_NAME="$INITIALS-swarm-principal"
-CreateServicePrincipal $PRINCIPAL_NAME $RESOURCE_GROUP
+# tput setaf 2; echo 'Creating Service Principal and Role Assignment...' ; tput sgr0
+# PRINCIPAL_NAME="$INITIALS-swarm-principal"
+# CreateServicePrincipal $PRINCIPAL_NAME $RESOURCE_GROUP
 
 
 tput setaf 2; echo 'Creating SSH Keys...' ; tput sgr0
@@ -150,7 +150,7 @@ CreateSSHKeys $AZURE_USER
 
 
 tput setaf 2; echo 'Accepting Marketplace Terms and Conditions...' ; tput sgr0
-AcceptT&C "docker-ce-edge"
+AcceptTC "docker-ce-edge"
 
 
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
