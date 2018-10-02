@@ -1,0 +1,156 @@
+version: '3'
+services:
+  rabbitmq:
+    image: library/rabbitmq:3-management
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure
+          labels:
+            com.example.description: "piggymetrics"
+
+    ports:
+      - 15672:15672
+
+  config:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+    image: sqshq/piggymetrics-config:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure
+    
+
+  registry:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+    image: sqshq/piggymetrics-registry:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure
+    ports:
+      - 8761:8761
+
+  gateway:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+    image: sqshq/piggymetrics-gateway:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure
+    ports:
+      - 8081:4000
+
+  auth-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+      NOTIFICATION_SERVICE_PASSWORD: "test"
+      STATISTICS_SERVICE_PASSWORD: "test"
+      ACCOUNT_SERVICE_PASSWORD: "test"
+      MONGODB_PASSWORD: "test"
+    image: sqshq/piggymetrics-auth-service:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure
+
+  auth-mongodb:
+    environment:
+      MONGODB_PASSWORD: "test"
+    image: sqshq/piggymetrics-mongodb:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+
+  account-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+      ACCOUNT_SERVICE_PASSWORD: "test"
+      MONGODB_PASSWORD: "test"
+    image: sqshq/piggymetrics-account-service:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+
+  account-mongodb:
+    environment:
+      INIT_DUMP: account-service-dump.js
+      MONGODB_PASSWORD: "test"
+    image: sqshq/piggymetrics-mongodb:latest    
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure
+    
+
+  statistics-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+      MONGODB_PASSWORD: "test"
+      STATISTICS_SERVICE_PASSWORD: "test"
+    image: sqshq/piggymetrics-statistics-service:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+    
+
+  statistics-mongodb:
+    environment:
+      MONGODB_PASSWORD: "test"
+    image: sqshq/piggymetrics-mongodb:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+
+  notification-service:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+      MONGODB_PASSWORD: "test"
+      NOTIFICATION_SERVICE_PASSWORD: "test"
+    image: sqshq/piggymetrics-notification-service:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+
+  notification-mongodb:
+    image: sqshq/piggymetrics-mongodb:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+    environment:
+      MONGODB_PASSWORD: "test"
+
+  monitoring:
+    environment:
+      CONFIG_SERVICE_PASSWORD: "test"
+    image: sqshq/piggymetrics-monitoring:latest
+    deploy:
+          update_config:
+            delay: 10s
+          restart_policy:
+            condition: on-failure    
+    
+    ports:
+      - 9000:8080
+      - 8989:8989
