@@ -139,8 +139,8 @@ CreateResourceGroup $RESOURCE_GROUP $AZURE_LOCATION
 
 
 # tput setaf 2; echo 'Creating Service Principal and Role Assignment...' ; tput sgr0
-# PRINCIPAL_NAME="$INITIALS-swarm-principal"
-# CreateServicePrincipal $PRINCIPAL_NAME $RESOURCE_GROUP
+PRINCIPAL_NAME="$INITIALS-swarm-principal"
+CreateServicePrincipal $PRINCIPAL_NAME $RESOURCE_GROUP
 
 
 tput setaf 2; echo 'Creating SSH Keys...' ; tput sgr0
@@ -156,4 +156,5 @@ AcceptTC "docker-ce-edge"
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
 az group deployment create --template-file azuredeploy.json  \
     --resource-group $RESOURCE_GROUP \
+    --parameters azuredeploy.parameters.json \
     --parameters servicePrincipalAppId=$CLIENT_ID --parameters servicePrincipalAppSecret=$CLIENT_SECRET

@@ -153,7 +153,7 @@
         "channelTag": "edge",
         "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354",
 
-        "storageAccountSuffix": "docker",
+
         "uniqueStringArray": [
             "[concat(variables('prefix'), uniqueString(concat(resourceGroup().id, '0')))]",
             "[concat(variables('prefix'), uniqueString(concat(resourceGroup().id, '1')))]",
@@ -161,7 +161,7 @@
             "[concat(variables('prefix'), uniqueString(concat(resourceGroup().id, '3')))]",
             "[concat(variables('prefix'), uniqueString(concat(resourceGroup().id, '4')))]"
         ],
-        "swarmInfoStorageAccount": "[concat(variables('uniqueStringArray')[0], variables('storageAccountSuffix'))]",
+        "swarmInfoStorageAccount": "[variables('uniqueStringArray')[0]]",
         "swarmLogsStorageAccount": "[concat(variables('prefix'), uniqueString(concat(resourceGroup().id)), 'logs')]",
         "vhdContainerName": "dockervhd",
         
@@ -201,13 +201,13 @@
         "managerName": "[concat(variables('managerNamePrefix'), '-vmss')]",
         
         "sshKeyPath": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
-        "customData": "[concat('export ACCOUNT_ID=\"', subscription().subscriptionId, '\"', '\n', 'export SUB_ID=\"', subscription().subscriptionId, '\"', '\n', 'export GROUP_NAME=\"', resourceGroup().name, '\"', '\n', 'export LB_NAME=\"', variables('lbName'), '\"', '\n', 'export APP_ID=\"', parameters('servicePrincipalAppId'), '\"', '\n', 'export APP_SECRET=\"', parameters('servicePrincipalAppSecret'), '\"', '\n', 'export TENANT_ID=\"', subscription().tenantId, '\"', '\n', 'export SWARM_INFO_STORAGE_ACCOUNT=\"', variables('swarmInfoStorageAccount'), '\"', '\n', 'export SWARM_LOGS_STORAGE_ACCOUNT=\"', variables('swarmLogsStorageAccount'), '\"', '\n', 'export PRIVATE_IP=$(ifconfig eth0 | grep \"inet addr:\" | cut -d: -f2 | cut -d\" \" -f1)\n', 'export AZURE_HOSTNAME=$(hostname)\n', '\n', 'docker run --label com.docker.editions.system --log-driver=json-file --restart=no -it -e LB_NAME -e SUB_ID -e ROLE -e TENANT_ID -e APP_ID -e APP_SECRET -e ACCOUNT_ID -e GROUP_NAME -e PRIVATE_IP -e DOCKER_FOR_IAAS_VERSION -e SWARM_INFO_STORAGE_ACCOUNT -e SWARM_LOGS_STORAGE_ACCOUNT -e AZURE_HOSTNAME -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -v /var/log:/var/log docker4x/init-azure:\"$DOCKER_FOR_IAAS_VERSION\"\n')]"          
+        "customData": "[concat('export ACCOUNT_ID=\"', subscription().subscriptionId, '\"', '\n', 'export SUB_ID=\"', subscription().subscriptionId, '\"', '\n', 'export GROUP_NAME=\"', resourceGroup().name, '\"', '\n', 'export LB_NAME=\"', variables('lbName'), '\"', '\n', 'export APP_ID=\"', parameters('servicePrincipalAppId'), '\"', '\n', 'export APP_SECRET=\"', parameters('servicePrincipalAppSecret'), '\"', '\n', 'export TENANT_ID=\"', subscription().tenantId, '\"', '\n', 'export SWARM_INFO_STORAGE_ACCOUNT=\"', variables('swarmInfoStorageAccount'), '\"', '\n', 'export SWARM_LOGS_STORAGE_ACCOUNT=\"', variables('swarmLogsStorageAccount'), '\"', '\n', 'export PRIVATE_IP=$(ifconfig eth0 | grep \"inet addr:\" | cut -d: -f2 | cut -d\" \" -f1)\n', 'export AZURE_HOSTNAME=$(hostname)\n', '\n', 'docker run --label com.docker.editions.system --log-driver=json-file --restart=no -it -e LB_NAME -e SUB_ID -e ROLE -e TENANT_ID -e APP_ID -e APP_SECRET -e ACCOUNT_ID -e GROUP_NAME -e PRIVATE_IP -e DOCKER_FOR_IAAS_VERSION -e SWARM_INFO_STORAGE_ACCOUNT -e SWARM_LOGS_STORAGE_ACCOUNT -e AZURE_HOSTNAME -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -v /var/log:/var/log docker4x/azure-init:\"$DOCKER_FOR_IAAS_VERSION\"\n')]"          
     },
     "resources": [
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2017-06-01",
-            "name": "[concat(variables('uniqueStringArray')[copyIndex()], variables('storageAccountSuffix'))]",
+            "name": "[variables('uniqueStringArray')[copyIndex()]]",
             "location": "[resourceGroup().location]",
             "copy": {
                 "count": "[length(variables('uniqueStringArray'))]",
@@ -411,7 +411,7 @@
                     "diagnosticsProfile": {
                         "bootDiagnostics": {
                             "enabled": true,
-                            "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('storageAccountSuffix'))).primaryEndpoints.blob]"
+                            "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0])).primaryEndpoints.blob]"
                         }
                     },
                     "networkProfile": {
@@ -468,7 +468,7 @@
                             "createOption": "FromImage",
                             "name": "[concat(variables('managerName'), 'vmssosdisk')]",
                             "vhdContainers": [
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('storageAccountSuffix'))).primaryEndpoints.blob, variables('vhdContainerName'))]"
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0])).primaryEndpoints.blob, variables('vhdContainerName'))]"
                             ]
                         }
                     }
@@ -508,7 +508,7 @@
                     "diagnosticsProfile": {
                         "bootDiagnostics": {
                             "enabled": true,
-                            "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('storageAccountSuffix'))).primaryEndpoints.blob]"
+                            "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0])).primaryEndpoints.blob]"
                         }
                     },
                     "networkProfile": {
@@ -560,11 +560,11 @@
                             "createOption": "FromImage",
                             "name": "[concat(variables('workerName'), 'vmssosdisk', 0)]",
                             "vhdContainers": [
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0], variables('storageAccountSuffix'))).primaryEndpoints.blob, variables('vhdContainerName'))]",
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1], variables('storageAccountSuffix'))).primaryEndpoints.blob, variables('vhdContainerName'))]",
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2], variables('storageAccountSuffix'))).primaryEndpoints.blob, variables('vhdContainerName'))]",
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3], variables('storageAccountSuffix'))).primaryEndpoints.blob, variables('vhdContainerName'))]",
-                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4], variables('storageAccountSuffix'))).primaryEndpoints.blob, variables('vhdContainerName'))]"
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[0])).primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[1])).primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[2])).primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[3])).primaryEndpoints.blob, variables('vhdContainerName'))]",
+                                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('uniqueStringArray')[4])).primaryEndpoints.blob, variables('vhdContainerName'))]"
                             ]
                         }
                     }
