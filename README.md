@@ -1,21 +1,84 @@
+Docker Swarm Apps
+===
+
+Tips
+---
+
+```bash
+# SSH to the Manager Node
+NatLB="<your_ip>"
+
+ssh docker@$NatLB -p 50000
+```
+
+```bash
+# Transfer Keys to the Manager to enable SSH to workers
+NatLB="<your_ip>"
+
+scp -P 50000 ~/.ssh/id_rsa ~/.ssh/id_rsa.pub docker@$NatLB:/home/docker/.ssh
+```
+
+```bash
+# Deploying and Updating Docker Stacks
+
+docker stack deploy -c <path_to_your_compose> <stackname>
+docker stack up deploy -c <path_to_your_compose> <stackname>
+```
 
 
+Swarm Visualizer
+---
+
+```bash
+# Startup the Visualizer Service
+docker service create \
+  --name=viz \
+  --publish=8080:8080/tcp \
+  --constraint=node.role==manager \
+  --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock \
+  dockersamples/visualizer
+```
+
+```bash
+# Startup Voting App
+wget https://raw.githubusercontent.com/danielscholl/docker-for-azure/master/apps/docker-compose-votingapp.yml && \
+  docker stack deploy \
+    -c docker-compose-votingapp.yml \
+    votingapp
+```
+
+#### Voting App
+
+```bash
+# Startup Voting App
+URL="https://raw.githubusercontent.com/danielscholl/docker-for-azure/master/apps/docker-compose-votingapp.yml"
+wget $URL && \
+  docker stack deploy \
+    -c docker-compose-votingapp.yml \
+    votingapp
+```
+*  Vote: http://swarmLB:5002/
+*  Voting Results: http://swarmLB:5003
 
 
-#### Tips
+#### Spring Cloud Netflix Samples
+Forked from https://github.com/sqshq/PiggyMetrics, this example demonstrates the use of Netlix OSS API with Spring. The docker-compose file has been updated to make use of the latest features of Compose 3.0; it's still a work in progress. The service container logs are drained into OMS.
 
-* Post Deployment, one can ssh to the manager using the id_rsa.pub as mentioned during swarm creation:
- <code>ssh docker@sshlbrip -p 50000</code>
+```bash
+URL="https://raw.githubusercontent.com/danielscholl/docker-for-azure/master/apps/docker-comopose-piggymetrics.yml"
 
+wget $URL && \
+  docker stack deploy \
+  -c docker-comopose-piggymetrics.yml \
+  piggymetrics
+```
+*  Rabbit MQ Service: http://swarmLB:15672/ (guest/guest)
+*  Eureka Service: http://swarmLB:8761/
+*  Echo Test Service: http://swarmLB:8989/
+*  PiggyMetrics Sprint Boot Service: http://swarmLB:8081/
+*  Hystrix: http://swarmLB:9000/hystrix
+*  Turbine Stream for Hystrix Dashboard: http://swarmLB:8989/turbine/turbine.stream
 
-* Transfer the keys to the swarm manager to use it as a jumpbox to workers:
-<code>scp -P 50000 ~/.ssh/id_rsa ~/.ssh/id_rsa.pub docker@sshlbrip:/home/docker/.ssh</code>
-
-* For Deploying a stack in v3 docker-compose file:
-<code>docker stack deploy -c --path to docker-compose.yml file-- --stackname-- </code>
-
-* To update stack:
-<code>docker stack up deploy -c --path to docker-compose.yml file-- --stackname--</code>
 
 
 #### Some Samples
@@ -24,27 +87,4 @@
 *  ElasticSearch Service: http://Docker4AzureRGExternalLoadBalance:9200/
 *  Kibana Service: http://Docker4AzureRGExternalLoadBalance:5601/
 
-
-
-<code>wget https://raw.githubusercontent.com/danielscholl/docker-for-azure/master/apps/docker-compose-votingapp.yml && docker stack deploy -c docker-compose-votingapp.yml votingapp</code>
-
-*  Vote: http://Docker4AzureRGExternalLoadBalance:5002/
-*  Voting Results: http://Docker4AzureRGExternalLoadBalance:5003
-*  @manomarks Swarm Visualizer: http://Docker4AzureRGExternalLoadBalance:8080 -
-  * <code>docker service create  --name=viz  --publish=8087:8080/tcp  --constraint=node.role==manager --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock  manomarks/visualizer</code>
-
-
-<code>wget https://raw.githubusercontent.com/robinong79/docker-swarm-monitoring/master/composefiles/docker-compose-monitoring.yml &&  wget https://raw.githubusercontent.com/robinong79/docker-swarm-monitoring/master/composefiles/docker-compose-logging.yml && docker network create --driver overlay monitoring && docker network create --driver overlay logging && docker stack deploy -c docker-compose-logging.yml elk &&  docker stack deploy -c docker-compose-monitoring.yml prommon</code>
-
-#### Spring Cloud Netflix Samples
-Forked from https://github.com/sqshq/PiggyMetrics, this example demonstrates the use of Netlix OSS API with Spring. The docker-compose file has been updated to make use of the latest features of Compose 3.0; it's still a work in progress. The service container logs are drained into OMS.
-
-<code> wget https://raw.githubusercontent.com/danielscholl/docker-for-azure/master/apps/docker-comopose-piggymetrics.yml && docker stack deploy -c docker-comopose-piggymetrics.yml piggymetrics </code>
-
-*  Rabbit MQ Service: http://Docker4AzureRGExternalLoadBalancer:15672/ (guest/guest)
-*  Eureka Service: http://Docker4AzureRGExternalLoadBalance:8761/
-*  Echo Test Service: http://Docker4AzureRGExternalLoadBalance:8989/
-*  PiggyMetrics Sprint Boot Service: http://Docker4AzureRGExternalLoadBalance:8081/
-*  Hystrix: http://Docker4AzureRGExternalLoadBalance:9000/hystrix
-  * Turbine Stream for Hystrix Dashboard: http://Docker4AzureRGExternalLoadBalance:8989/turbine/turbine.stream
 
