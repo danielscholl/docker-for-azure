@@ -28,39 +28,12 @@ fi
 ###############################
 ## FUNCTIONS                 ##
 ###############################
-function CreateResourceGroup() {
-  # Required Argument $1 = RESOURCE_GROUP
-  # Required Argument $2 = LOCATION
 
-  if [ -z $1 ]; then
-    tput setaf 1; echo 'ERROR: Argument $1 (RESOURCE_GROUP) not received'; tput sgr0
-    exit 1;
-  fi
-  if [ -z $2 ]; then
-    tput setaf 1; echo 'ERROR: Argument $2 (LOCATION) not received'; tput sgr0
-    exit 1;
-  fi
-
-  local _result=$(az group show --name $1)
-  if [ "$_result"  == "" ]
-    then
-      OUTPUT=$(az group create --name $1 \
-        --location $2 \
-        -ojsonc)
-    else
-      tput setaf 3;  echo "Resource Group $1 already exists."; tput sgr0
-    fi
-}
 function CreateServicePrincipal() {
     # Required Argument $1 = PRINCIPAL_NAME
-    # Required Argument $2 = RESOURCE_GROUP
 
     if [ -z $1 ]; then
         tput setaf 1; echo 'ERROR: Argument $1 (PRINCIPAL_NAME) not received'; tput sgr0
-        exit 1;
-    fi
-    if [ -z $2 ]; then
-        tput setaf 1; echo 'ERROR: Argument $2 (RESOURCE_GROUP) not received'; tput sgr0
         exit 1;
     fi
 
@@ -74,14 +47,18 @@ function CreateServicePrincipal() {
       CLIENT_ID=$(az ad sp list \
         --display-name $1 \
         --query [].appId -otsv)
+      OBJECT_ID=$(az ad sp list \
+        --display-name $1 \
+        --query [].objectId -otsv)
+      UNIQUE=$(echo $RANDOM | cut -c 1-3)
 
-      SCOPE=$(az group show --name $2 --query id -otsv)
-      
-      az role assignment create --assignee $CLIENT_ID --scope $SCOPE --role Contributor
 
       echo "" >> .envrc
       echo "export CLIENT_ID=${CLIENT_ID}" >> .envrc
       echo "export CLIENT_SECRET=${CLIENT_SECRET}" >> .envrc
+      echo "export OBJECT_ID=${OBJECT_ID}" >> .envrc
+      echo "export UNIQUE=${UNIQUE}" >> .envrc
+
     else
         tput setaf 3;  echo "Service Principal $1 already exists."; tput sgr0
         if [ -z $CLIENT_ID ]; then
@@ -93,28 +70,31 @@ function CreateServicePrincipal() {
           tput setaf 1; echo 'ERROR: Principal exists but CLIENT_SECRET not provided' ; tput sgr0
           exit 1;
         fi
+
+        if [ -z $OBJECT_ID ]; then
+          tput setaf 1; echo 'ERROR: Principal exists but OBJECT_ID not provided' ; tput sgr0
+          exit 1;
+        fi
+
+        if [ -z $UNIQUE ]; then
+          tput setaf 1; echo 'ERROR: UNIQUE not provided' ; tput sgr0
+          exit 1;
+        fi
     fi
 }
 function CreateSSHKeys() {
   # Required Argument $1 = SSH_USER
-
-  if [ -f ~/.ssh/id_rsa.pub ]
+  if [ -d ~/.ssh ]
   then
     tput setaf 3;  echo "SSH Keys for User $1: "; tput sgr0
-    _result=`cat ~/.ssh/id_rsa.pub`
-
   else
-    if [ -d ./.ssh ]
-    then 
-      tput setaf 3;  echo "SSH Keys for User $1: "; tput sgr0
-    else 
-      mkdir .ssh && cd .ssh
-      ssh-keygen -t rsa -b 2048 -C $1 -f id_rsa && cd ..
-      _result=`cat ./.ssh/id_rsa.pub`
-    fi 
+    local _BASE_DIR = ${pwd}
+    mkdir ~/.ssh && cd ~/.ssh
+    ssh-keygen -t rsa -b 2048 -C $1 -f id_rsa && cd $_BASE_DIR
   fi
 
-   echo $_result
+ _result=`cat ~/.ssh/id_rsa.pub`
+
 }
 
 function AcceptTC() {
@@ -133,18 +113,12 @@ function AcceptTC() {
 ## Azure Intialize           ##
 ###############################
 
-tput setaf 2; echo 'Creating Resource Group...' ; tput sgr0
-RESOURCE_GROUP="$INITIALS-swarm"
-CreateResourceGroup $RESOURCE_GROUP $AZURE_LOCATION
-
-
-# tput setaf 2; echo 'Creating Service Principal and Role Assignment...' ; tput sgr0
+tput setaf 2; echo 'Creating Service Principal and Role Assignment...' ; tput sgr0
 PRINCIPAL_NAME="$INITIALS-swarm-principal"
-CreateServicePrincipal $PRINCIPAL_NAME $RESOURCE_GROUP
-
+CreateServicePrincipal $PRINCIPAL_NAME
 
 tput setaf 2; echo 'Creating SSH Keys...' ; tput sgr0
-AZURE_USER=$(az account show --query user.name -otsv) 
+AZURE_USER=$(az account show --query user.name -otsv)
 LINUX_USER=(${AZURE_USER//@/ })
 CreateSSHKeys $AZURE_USER
 
@@ -152,9 +126,11 @@ CreateSSHKeys $AZURE_USER
 tput setaf 2; echo 'Accepting Marketplace Terms and Conditions...' ; tput sgr0
 AcceptTC "docker-ce-edge"
 
-
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
-az group deployment create --template-file azuredeploy.json  \
-    --resource-group $RESOURCE_GROUP \
-    --parameters azuredeploy.parameters.json \
-    --parameters servicePrincipalAppId=$CLIENT_ID --parameters servicePrincipalAppSecret=$CLIENT_SECRET
+if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
+az deployment create --template-file azuredeploy.json  \
+    --location $AZURE_LOCATION \
+    --parameters $PARAMS \
+    --parameters random=$UNIQUE \
+    --parameters servicePrincipalAppId=$CLIENT_ID \
+    --parameters servicePrincipalAppSecret=$CLIENT_SECRET
