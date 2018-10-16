@@ -6,15 +6,16 @@ Tips
 
 ```bash
 # SSH to the Manager Node
-NatLB="<your_ip>"
+ResourceGroup="demo-swarm"
+IPName="$ResourceGroup-nat-ip"
+
+NatLB="$(az network public-ip show --resource-group $ResourceGroup --name $IPName --query ipAddress -otsv)"
 
 ssh docker@$NatLB -p 50000
 ```
 
 ```bash
 # Transfer Keys to the Manager to enable SSH to workers
-NatLB="<your_ip>"
-
 scp -P 50000 ~/.ssh/id_rsa ~/.ssh/id_rsa.pub docker@$NatLB:/home/docker/.ssh
 ```
 
