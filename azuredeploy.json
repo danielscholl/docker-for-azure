@@ -197,7 +197,7 @@
         },
         "parameters": {
           "prefix": {
-            "value": "[parameters('initials')]"
+            "value": "[parameters('random')]"
           },
           "servicePrincipalAppId": {
             "value": "[parameters('servicePrincipalAppId')]"
