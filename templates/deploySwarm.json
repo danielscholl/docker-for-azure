@@ -153,14 +153,14 @@
     "channelTag": "edge",
     "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354",
     "uniqueStringArray": [
-      "[concat(uniqueString(concat(resourceGroup().id, variables('prefix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('prefix'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('prefix'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('prefix'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('prefix'), '4')))]"
+      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '0')]",
+      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '1')]",
+      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '2')]",
+      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '3')]",
+      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '4')]"
     ],
+    "swarmLogsStorageAccount": "[concat(variables('prefix'), uniqueString(resourceGroup().id), 'logs')]",
     "swarmInfoStorageAccount": "[variables('uniqueStringArray')[0]]",
-    "swarmLogsStorageAccount": "[concat(uniqueString(concat(resourceGroup().id)), variables('prefix'), 'logs')]",
     "vhdContainerName": "dockervhd",
     "vnetName": "[concat(resourceGroup().name, '-vnet')]",
     "vnetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]",
@@ -176,7 +176,7 @@
     "lbNatPoolId": "[concat(variables('lbNatId'),'/inboundNatPools/default')]",
     "lbNatBePoolId": "[concat(variables('lbNatId'),'/backendAddressPools/default')]",
     "lbNatFeIpConfigId": "[concat(variables('lbNatId'),'/frontendIPConfigurations/default')]",
-    "lbNatIpName": "[concat(resourceGroup().name, '-', variables('lbNatName'), '-ip')]",
+    "lbNatIpName": "[concat(variables('lbNatName'), '-ip')]",
     "linuxImageOffer": "docker-ce-edge",
     "linuxImagePublisher": "docker",
     "linuxImageReference": {
@@ -188,9 +188,9 @@
     "linuxImageSku": "docker-ce-edge",
     "linuxImageVersion": "1.0.7",
     "workerNamePrefix": "swarm-worker",
-    "workerName": "[concat(variables('workerNamePrefix'), '-vmss-', variables('prefix'))]",
-    "managerNamePrefix": "[concat('swarm-managaer-', variables('prefix'))]",
-    "managerName": "[concat(variables('managerNamePrefix'), '-vmss-', variables('prefix'))]",
+    "managerNamePrefix": "swarm-manager",
+    "workerName": "[concat(variables('workerNamePrefix'), '-', variables('prefix'))]",
+    "managerName": "[concat(variables('managerNamePrefix'), '-', variables('prefix'))]",
     "sshKeyPath": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]",
     "customData": "[concat('export ACCOUNT_ID=\"', subscription().subscriptionId, '\"', '\n', 'export SUB_ID=\"', subscription().subscriptionId, '\"', '\n', 'export GROUP_NAME=\"', resourceGroup().name, '\"', '\n', 'export LB_NAME=\"', variables('lbName'), '\"', '\n', 'export APP_ID=\"', parameters('servicePrincipalAppId'), '\"', '\n', 'export APP_SECRET=\"', parameters('servicePrincipalAppSecret'), '\"', '\n', 'export TENANT_ID=\"', subscription().tenantId, '\"', '\n', 'export SWARM_INFO_STORAGE_ACCOUNT=\"', variables('swarmInfoStorageAccount'), '\"', '\n', 'export SWARM_LOGS_STORAGE_ACCOUNT=\"', variables('swarmLogsStorageAccount'), '\"', '\n', 'export PRIVATE_IP=$(ifconfig eth0 | grep \"inet addr:\" | cut -d: -f2 | cut -d\" \" -f1)\n', 'export AZURE_HOSTNAME=$(hostname)\n', '\n', 'docker run --label com.docker.editions.system --log-driver=json-file --restart=no -it -e LB_NAME -e SUB_ID -e ROLE -e TENANT_ID -e APP_ID -e APP_SECRET -e ACCOUNT_ID -e GROUP_NAME -e PRIVATE_IP -e DOCKER_FOR_IAAS_VERSION -e SWARM_INFO_STORAGE_ACCOUNT -e SWARM_LOGS_STORAGE_ACCOUNT -e AZURE_HOSTNAME -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -v /var/log:/var/log docker4x/init-azure:\"$DOCKER_FOR_IAAS_VERSION\"\n')]"
   },
