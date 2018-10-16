@@ -153,13 +153,13 @@
     "channelTag": "edge",
     "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354",
     "uniqueStringArray": [
-      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '0')]",
-      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '1')]",
-      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '2')]",
-      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '3')]",
-      "[concat(variables('prefix'), uniqueString(resourceGroup().id), '4')]"
+      "[concat(uniqueString(resourceGroup().id), variables('prefix'), '0')]",
+      "[concat(uniqueString(resourceGroup().id), variables('prefix'), '1')]",
+      "[concat(uniqueString(resourceGroup().id), variables('prefix'), '2')]",
+      "[concat(uniqueString(resourceGroup().id), variables('prefix'), '3')]",
+      "[concat(uniqueString(resourceGroup().id), variables('prefix'), '4')]"
     ],
-    "swarmLogsStorageAccount": "[concat(variables('prefix'), uniqueString(resourceGroup().id), 'logs')]",
+    "swarmLogsStorageAccount": "[concat(uniqueString(resourceGroup().id), variables('prefix'), 'logs')]",
     "swarmInfoStorageAccount": "[variables('uniqueStringArray')[0]]",
     "vhdContainerName": "dockervhd",
     "vnetName": "[concat(resourceGroup().name, '-vnet')]",
@@ -171,7 +171,7 @@
     "lbBePoolId": "[concat(variables('lbId'),'/backendAddressPools/default')]",
     "lbIpName": "[concat(variables('lbName'), '-ip')]",
     "lbIpDnsName": "[concat('applb-', uniqueString(resourceGroup().id))]",
-    "lbNatName": "[concat(resourceGroup().name, '-nat-lb')]",
+    "lbNatName": "[concat(resourceGroup().name, '-nat')]",
     "lbNatId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbNatName'))]",
     "lbNatPoolId": "[concat(variables('lbNatId'),'/inboundNatPools/default')]",
     "lbNatBePoolId": "[concat(variables('lbNatId'),'/backendAddressPools/default')]",
