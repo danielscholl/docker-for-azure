@@ -43,6 +43,12 @@
       },
       "type": "securestring"
     },
+    "servicePrincipalObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "ObjectId of Service Principal."
+      }
+    },
     "vnetPrefix": {
       "defaultValue": "172.16.0.0/24",
       "metadata": {
@@ -204,6 +210,9 @@
           },
           "servicePrincipalAppSecret": {
             "value": "[parameters('servicePrincipalAppSecret')]"
+          },
+          "servicePrincipalId": {
+            "value": "[parameters('servicePrincipalObjectId')]"
           },
           "vnetPrefix": {
             "value": "[parameters('vnetPrefix')]"

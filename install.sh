@@ -134,4 +134,5 @@ az deployment create --template-file azuredeploy.json  \
     --parameters $PARAMS \
     --parameters random=$UNIQUE initials=$INITIALS \
     --parameters servicePrincipalAppId=$CLIENT_ID \
-    --parameters servicePrincipalAppSecret=$CLIENT_SECRET
+    --parameters servicePrincipalAppSecret=$CLIENT_SECRET \
+    --parameters servicePrincipalObjectId=$OBJECT_ID
