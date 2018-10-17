@@ -188,6 +188,33 @@
       "properties": {}
     },
     {
+      "name": "TemplateRole",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[variables('defaultGroup')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployRole.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "principalId": {
+            "value": "[parameters('servicePrincipalObjectId')]"
+          },
+          "builtInRoleType": {
+            "value": "Contributor"
+          },
+          "roleNameGuid": {
+            "value": "[guid(subscription().id)]"
+          }
+        }
+      }
+    },
+    {
       "name": "TemplateSwarm",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
@@ -210,9 +237,6 @@
           },
           "servicePrincipalAppSecret": {
             "value": "[parameters('servicePrincipalAppSecret')]"
-          },
-          "servicePrincipalId": {
-            "value": "[parameters('servicePrincipalObjectId')]"
           },
           "vnetPrefix": {
             "value": "[parameters('vnetPrefix')]"
