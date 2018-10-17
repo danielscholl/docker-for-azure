@@ -176,55 +176,12 @@
       "type": "string"
     }
   },
-  "variables": {
-    "defaultGroup": "[concat(parameters('initials'), '-swarm')]"
-  },
+  "variables": {},
   "resources": [
-    {
-      "type": "Microsoft.Resources/resourceGroups",
-      "apiVersion": "2018-05-01",
-      "location": "[parameters('location')]",
-      "name": "[variables('defaultGroup')]",
-      "tags": {
-        "initials": "[parameters('initials')]"
-      },
-      "properties": {}
-    },
-    {
-      "name": "TemplateRole",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "resourceGroup": "[variables('defaultGroup')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployRole.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "principalId": {
-            "value": "[parameters('servicePrincipalObjectId')]"
-          },
-          "builtInRoleType": {
-            "value": "Contributor"
-          },
-          "roleNameGuid": {
-            "value": "[guid(subscription().id)]"
-          }
-        }
-      }
-    },
     {
       "name": "TemplateStorage",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
-      "resourceGroup": "[variables('defaultGroup')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -245,10 +202,6 @@
       "name": "TemplateLogStorage",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
-      "resourceGroup": "[variables('defaultGroup')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -269,10 +222,6 @@
       "name": "TemplateVNet",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
-      "resourceGroup": "[variables('defaultGroup')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
-      ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
@@ -293,9 +242,7 @@
       "name": "TemplatePrivateKeyVault",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
-      "resourceGroup": "[variables('defaultGroup')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]",
         "TemplateStorage",
         "TemplateLogStorage"
       ],
