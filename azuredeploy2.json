@@ -225,7 +225,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployVNet.json')]",
+          "uri": "[concat(parameters('templateURL'), 'deployVnet.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
