@@ -185,6 +185,9 @@
       "apiVersion": "2018-05-01",
       "location": "[parameters('location')]",
       "name": "[variables('defaultGroup')]",
+      "tags": {
+        "initials": "parameters('initials')]"
+      },
       "properties": {}
     },
     {

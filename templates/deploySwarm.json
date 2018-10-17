@@ -210,7 +210,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -224,7 +225,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -250,7 +252,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -266,7 +269,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -307,7 +311,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -320,7 +325,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -375,7 +381,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -472,7 +479,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     },
     {
@@ -568,7 +576,8 @@
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "variables('prefix')]"
       }
     }
   ],
