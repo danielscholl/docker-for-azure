@@ -178,7 +178,7 @@
         },
         {
           "type": "secrets",
-          "name": "[parameters('logAccountKey')]",
+          "name": "[parameters('logAccountName')]",
           "apiVersion": "2018-02-14",
           "properties": {
             "value": "[parameters('logAccountKey')]"
