@@ -8,7 +8,7 @@
         "description": "Virtual Network Address Prefix CIDR"
       }
     },
-    "subnet1Prefix": {
+    "subnetPrefix": {
       "type": "string",
       "metadata": {
         "description": "Subnet 1 Address Prefix CIDR"
@@ -18,37 +18,36 @@
   "variables": {
     "VNetName": "[concat(resourceGroup().name, '-vnet')]",
     "VNetId": "[resourceId('Microsoft.Network/virtualNetworks', variables('VNetName'))]",
-    "Subnet1Name": "swarmtier",
-    "SubNet1Id": "[concat(variables('VNetId'), '/subnets/', variables('Subnet1Name'))]",
+    "SubnetName": "swarmtier",
+    "SubNetId": "[concat(variables('VNetId'), '/subnets/', variables('SubnetName'))]",
     "channelTag": "edge",
     "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354"
   },
   "resources": [
     {
-      "comments": "## Virtual Network ##",
-      "name": "[variables('VNetName')]",
       "type": "Microsoft.Network/virtualNetworks",
-      "apiVersion": "2018-08-01",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('vnetName')]",
       "location": "[resourceGroup().location]",
-      "tags": {
-        "displayName": "Virtual Network",
-        "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
-      },
       "properties": {
         "addressSpace": {
           "addressPrefixes": [
-            "[parameters('VNetPrefix')]"
+            "[parameters('vnetPrefix')]",
+            "[parameters('subnetPrefix')]"
           ]
         },
         "subnets": [
           {
-            "name": "[variables('Subnet1Name')]",
+            "name": "[variables('subnetName')]",
             "properties": {
-              "addressPrefix": "[parameters('Subnet1Prefix')]"
+              "addressPrefix": "[parameters('subnetPrefix')]"
             }
           }
         ]
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
       }
     }
   ],
@@ -63,8 +62,8 @@
     "subnets": {
       "type": "object",
       "value": {
-        "subnet1Name": "[variables('Subnet1Name')]",
-        "subnet1Id": "[variables('subnet1Id')]"
+        "subnet1Name": "[variables('SubnetName')]",
+        "subnet1Id": "[variables('subnetId')]"
       }
     }
   }

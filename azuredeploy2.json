@@ -232,7 +232,7 @@
           "vnetPrefix": {
             "value": "[parameters('vnetPrefix')]"
           },
-          "subnet1Prefix": {
+          "subnetPrefix": {
             "value": "[parameters('subnetPrefix')]"
           }
         }
