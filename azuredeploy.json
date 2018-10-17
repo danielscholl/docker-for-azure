@@ -228,7 +228,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployStorageAccount.json')]",
+          "uri": "[concat(parameters('templateURL'), 'deployStorage.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
