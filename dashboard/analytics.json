@@ -1,0 +1,492 @@
+{
+  "properties": {
+    "lenses": {
+      "0": {
+        "order": 0,
+        "parts": {
+          "0": {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 3,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceGroup",
+                  "isOptional": true
+                },
+                {
+                  "name": "id",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/demo-swarm",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ResourceGroupMapPinnedPart",
+              "defaultMenuItemId": "overview"
+            }
+          },
+          "1": {
+            "position": {
+              "x": 3,
+              "y": 0,
+              "colSpan": 3,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "value": {
+                    "SubscriptionId": "7bcc3722-fb88-4625-a161-d1515b8d0f6e",
+                    "ResourceGroup": "oms",
+                    "Name": "msdn1-logs",
+                    "ResourceId": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourcegroups/oms/providers/microsoft.operationalinsights/workspaces/msdn1-logs"
+                  }
+                },
+                {
+                  "name": "Query",
+                  "value": "search \"AzureActivity\" | where OperationName == \"List Storage Account Keys\" | summarize count() by bin(EventSubmissionTimestamp, 1m)"
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "PT6H"
+                },
+                {
+                  "name": "Version",
+                  "value": "1.0"
+                },
+                {
+                  "name": "DashboardId",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/dashboards/providers/Microsoft.Portal/dashboards/59fb6c41-d769-4ad4-8fb9-7c583b1494d3"
+                },
+                {
+                  "name": "PartId",
+                  "value": "4fd1e14c-e0a8-4c65-b6b5-0edde3c93fd9"
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics"
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "msdn1-logs"
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "value": "workspace"
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid"
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/AppInsightsExtension/PartType/AnalyticsPart",
+              "settings": {
+                "content": {
+                  "PartTitle": "API Calls - Table",
+                  "PartSubTitle": "guide-azure"
+                }
+              },
+              "asset": {
+                "idInputName": "ComponentId",
+                "type": "ApplicationInsights"
+              }
+            }
+          },
+          "2": {
+            "position": {
+              "x": 6,
+              "y": 0,
+              "colSpan": 7,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "value": {
+                    "SubscriptionId": "7bcc3722-fb88-4625-a161-d1515b8d0f6e",
+                    "ResourceGroup": "oms",
+                    "Name": "msdn1-logs",
+                    "ResourceId": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourcegroups/oms/providers/microsoft.operationalinsights/workspaces/msdn1-logs"
+                  }
+                },
+                {
+                  "name": "Query",
+                  "value": "search \"AzureActivity\" | where OperationName == \"List Storage Account Keys\" | summarize count() by bin(EventSubmissionTimestamp, 1m)"
+                },
+                {
+                  "name": "TimeRange",
+                  "value": "PT6H"
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "EventSubmissionTimestamp",
+                      "type": "DateTime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "count_",
+                        "type": "Int64"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  }
+                },
+                {
+                  "name": "Version",
+                  "value": "1.0"
+                },
+                {
+                  "name": "DashboardId",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/dashboards/providers/Microsoft.Portal/dashboards/59fb6c41-d769-4ad4-8fb9-7c583b1494d3"
+                },
+                {
+                  "name": "PartId",
+                  "value": "7fd2f43a-37cb-4790-bfbe-f601e9676b00"
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics"
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "msdn1-logs"
+                },
+                {
+                  "name": "resourceTypeMode",
+                  "value": "workspace"
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsChart"
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line"
+                }
+              ],
+              "type": "Extension/AppInsightsExtension/PartType/AnalyticsPart",
+              "settings": {
+                "content": {
+                  "PartTitle": "API Calls",
+                  "PartSubTitle": "guide-azure"
+                }
+              },
+              "asset": {
+                "idInputName": "ComponentId",
+                "type": "ApplicationInsights"
+              }
+            }
+          },
+          "3": {
+            "position": {
+              "x": 22,
+              "y": 0,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "id",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourcegroups/oms/providers/Microsoft.OperationalInsights/workspaces/msdn1-logs/views/Swarm Principal API Calls"
+                },
+                {
+                  "name": "solutionId",
+                  "isOptional": true
+                },
+                {
+                  "name": "timeInterval",
+                  "value": {
+                    "_Now": "2018-10-03T15:53:56.122Z",
+                    "_duration": 86400000,
+                    "_end": null
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "timeRange",
+                  "binding": "timeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/ViewTileIFramePart"
+            }
+          },
+          "4": {
+            "position": {
+              "x": 0,
+              "y": 6,
+              "colSpan": 1,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "id",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/demo-swarm/providers/Microsoft.Network/loadBalancers/swarm-nat-lb"
+                }
+              ],
+              "type": "Extension/Microsoft_Azure_Network/PartType/LoadBalancerPart",
+              "asset": {
+                "idInputName": "id",
+                "type": "LoadBalancer"
+              },
+              "defaultMenuItemId": "overview"
+            }
+          },
+          "5": {
+            "position": {
+              "x": 1,
+              "y": 6,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "id",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourcegroups/oms/providers/Microsoft.OperationalInsights/workspaces/msdn1-logs/views/AzureActivity(msdn1-logs)"
+                },
+                {
+                  "name": "solutionId",
+                  "isOptional": true
+                },
+                {
+                  "name": "timeInterval",
+                  "value": {
+                    "_duration": 1800000,
+                    "_end": null,
+                    "_isAutoRefresh": false,
+                    "_restoredState": false,
+                    "_Now": "2018-10-03T15:54:18.040Z"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "timeRange",
+                  "binding": "timeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/ViewTileIFramePart"
+            }
+          },
+          "6": {
+            "position": {
+              "x": 5,
+              "y": 6,
+              "colSpan": 4,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "id",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourcegroups/oms/providers/Microsoft.OperationalInsights/workspaces/msdn1-logs/views/Swarm Principal API Calls"
+                },
+                {
+                  "name": "solutionId",
+                  "isOptional": true
+                },
+                {
+                  "name": "timeInterval",
+                  "value": {
+                    "_duration": 1800000,
+                    "_end": null,
+                    "_isAutoRefresh": false,
+                    "_restoredState": false,
+                    "_Now": "2018-10-03T15:54:18.040Z"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "timeRange",
+                  "binding": "timeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/ViewTileIFramePart"
+            }
+          },
+          "7": {
+            "position": {
+              "x": 0,
+              "y": 7,
+              "colSpan": 1,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "id",
+                  "value": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/demo-swarm/providers/Microsoft.Network/loadBalancers/swarm-lb"
+                }
+              ],
+              "type": "Extension/Microsoft_Azure_Network/PartType/LoadBalancerPart",
+              "asset": {
+                "idInputName": "id",
+                "type": "LoadBalancer"
+              },
+              "defaultMenuItemId": "overview"
+            }
+          },
+          "8": {
+            "position": {
+              "x": 0,
+              "y": 8,
+              "colSpan": 7,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "charts": [
+                      {
+                        "title": "CPU (average)",
+                        "metrics": [
+                          {
+                            "name": "Percentage CPU",
+                            "resourceMetadata": {
+                              "resourceId": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/demo-swarm/providers/Microsoft.Compute/virtualMachineScaleSets/swarm-worker-vmss"
+                            },
+                            "aggregationType": 1,
+                            "type": "host"
+                          }
+                        ],
+                        "itemDataModel": {
+                          "id": "defaultAiChartDivc11243dd-0e4f-4fe7-95a6-a1821bb8a069",
+                          "chartHeight": 1,
+                          "metrics": [
+                            {
+                              "id": {
+                                "resourceDefinition": {
+                                  "resourceId": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/demo-swarm/providers/Microsoft.Compute/virtualMachineScaleSets/swarm-worker-vmss",
+                                  "id": "/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/demo-swarm/providers/Microsoft.Compute/virtualMachineScaleSets/swarm-worker-vmss",
+                                  "name": "swarm-worker-vmss"
+                                },
+                                "name": {
+                                  "id": "Percentage CPU",
+                                  "displayName": "Percentage CPU"
+                                },
+                                "kind": {
+                                  "id": "host"
+                                }
+                              },
+                              "metricAggregation": 4,
+                              "color": "#47BDF5",
+                              "unit": 5,
+                              "useSIConversions": true,
+                              "displaySIUnit": true
+                            }
+                          ],
+                          "priorPeriod": false,
+                          "horizontalBars": true,
+                          "showOther": false,
+                          "palette": "multiColor",
+                          "jsonDefinitionId": "",
+                          "yAxisOptions": {
+                            "options": 1
+                          },
+                          "title": "CPU (average)",
+                          "titleKind": "Auto",
+                          "visualization": {
+                            "chartType": 2
+                          },
+                          "appliedISOGrain": "PT1M"
+                        },
+                        "timeContext": {
+                          "options": {
+                            "useDashboardTimeRange": false,
+                            "grain": 1
+                          },
+                          "relative": {
+                            "duration": 3600000
+                          }
+                        }
+                      }
+                    ],
+                    "v2charts": true
+                  }
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {}
+            }
+          },
+          "9": {
+            "position": {
+              "x": 7,
+              "y": 8,
+              "colSpan": 2,
+              "rowSpan": 1
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "queryInputs",
+                  "value": {
+                    "query": {
+                      "subscriptions": [
+                        "7bcc3722-fb88-4625-a161-d1515b8d0f6e"
+                      ],
+                      "levels": [
+                        "1",
+                        "2",
+                        "3",
+                        "4"
+                      ],
+                      "timeSpan": "0",
+                      "startTime": "2018-10-03T14:41:04.708Z",
+                      "endTime": "2018-10-03T15:41:04.708Z",
+                      "resourceGroupId": "all",
+                      "resourceId": "all",
+                      "resourceTypes": [
+                        "Microsoft.Storage/StorageAccounts"
+                      ],
+                      "operationNames": [],
+                      "caller": "all",
+                      "category": "all",
+                      "searchString": "",
+                      "queryName": "Storage Account API Calls"
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_Azure_ActivityLog/PartType/EventsQuerySummaryPart"
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": "arm/subscriptions/7bcc3722-fb88-4625-a161-d1515b8d0f6e/resourceGroups/dashboards/providers/Microsoft.Portal/dashboards/59fb6c41-d769-4ad4-8fb9-7c583b1494d3",
+  "name": "59fb6c41-d769-4ad4-8fb9-7c583b1494d3",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "centralus",
+  "tags": {
+    "hidden-title": "Daniel Swarm Dashboard"
+  },
+  "apiVersion": "2015-08-01-preview"
+}

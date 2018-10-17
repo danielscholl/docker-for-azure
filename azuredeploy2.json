@@ -31,13 +31,13 @@
       },
       "defaultValue": "https://raw.githubusercontent.com/danielscholl/docker-for-azure/master/templates/"
     },
-    "servicePrincipalAppId": {
+    "servicePrincipalClientId": {
       "metadata": {
         "description": "AD ServicePrincipal App ID"
       },
       "type": "string"
     },
-    "servicePrincipalAppSecret": {
+    "servicePrincipalClientKey": {
       "metadata": {
         "description": "AD ServicePrincipal App Secret"
       },
@@ -242,7 +242,7 @@
       }
     },
     {
-      "name": "TemplateStorage",
+      "name": "TemplateLogStorage",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
       "resourceGroup": "[variables('defaultGroup')]",
@@ -257,7 +257,7 @@
         },
         "parameters": {
           "prefix": {
-            "value": "logs"
+            "value": "log"
           },
           "storageAccountType": {
             "value": "Standard_LRS"
@@ -266,53 +266,75 @@
       }
     },
     {
-      "name": "TemplateSwarm",
+      "name": "TemplateVNet",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "resourceGroup": "[variables('defaultGroup')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployVNet.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vnetPrefix": {
+            "value": "[parameters('vnetPrefix')]"
+          },
+          "subnet1Prefix": {
+            "value": "[parameters('subnetPrefix')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "TemplatePrivateKeyVault",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
       "resourceGroup": "[variables('defaultGroup')]",
       "dependsOn": [
         "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]",
-        "TemplateRole"
+        "TemplateStorage",
+        "TemplateLogStorage"
       ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deploySwarm.json')]",
+          "uri": "[concat(parameters('templateURL'), 'deployPrivateKeyVault.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "prefix": {
-            "value": "[string(parameters('random'))]"
+            "value": "[parameters('initials')]"
           },
-          "servicePrincipalAppId": {
-            "value": "[parameters('servicePrincipalAppId')]"
+          "servicePrincipalClientId": {
+            "value": "[parameters('servicePrincipalClientId')]"
           },
-          "servicePrincipalAppSecret": {
-            "value": "[parameters('servicePrincipalAppSecret')]"
+          "servicePrincipalClientKey": {
+            "value": "[parameters('servicePrincipalClientKey')]"
           },
-          "vnetPrefix": {
-            "value": "[parameters('vnetPrefix')]"
+          "servicePrincipalObjectId": {
+            "value": "[parameters('servicePrincipalObjectId')]"
           },
-          "subnetPrefix": {
-            "value": "[parameters('subnetPrefix')]"
+          "adminUserName": {
+            "value": "[parameters('adminUserName')]"
           },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "sshKey": {
+          "publicSSHKeyData": {
             "value": "[parameters('sshKey')]"
           },
-          "workerCount": {
-            "value": "[parameters('workerCount')]"
+          "storageAccountName": {
+            "value": "[reference('TemplateStorage').outputs.storageAccount.value.name]"
           },
-          "workerSize": {
-            "value": "[parameters('workerSize')]"
+          "storageAccountKey": {
+            "value": "[reference('TemplateStorage').outputs.storageAccount.value.key]"
           },
-          "managerCount": {
-            "value": "[parameters('managerCount')]"
+          "logAccountName": {
+            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
           },
-          "managerSize": {
-            "value": "[parameters('managerSize')]"
+          "logAccountKey": {
+            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.key]"
           }
         }
       }
