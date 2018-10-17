@@ -285,6 +285,20 @@
           }
         }
       }
+    },
+    {
+      "name": "TemplateLoadBalancerBE",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "dependsOn": [],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployLoadBalancer.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {}
+      }
     }
   ],
   "outputs": {}

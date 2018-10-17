@@ -1,0 +1,81 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {},
+  "variables": {
+    "lbName": "[concat(resourceGroup().name, '-lb')]",
+    "lbId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
+    "lbIpName": "[concat(variables('lbName'), '-ip')]",
+    "lbIpDnsName": "[concat('applb-', uniqueString(resourceGroup().id))]",
+    "channelTag": "edge",
+    "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbIpName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "dnsSettings": {
+          "domainNameLabel": "[variables('lbIpDnsName')]"
+        },
+        "publicIPAllocationMethod": "Static"
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('lbIpName'))]"
+      ],
+      "properties": {
+        "backendAddressPools": [
+          {
+            "name": "default"
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "default",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('lbIpName'))]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "default",
+            "properties": {
+              "intervalInSeconds": 10,
+              "numberOfProbes": 2,
+              "port": 44554,
+              "protocol": "Tcp"
+            }
+          }
+        ]
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
+      }
+    }
+  ],
+  "outputs": {
+    "loadBalancer": {
+      "type": "object",
+      "value": {
+        "id": "[variables('LBId')]",
+        "name": "[variables('LBName')]"
+      }
+    }
+  }
+}

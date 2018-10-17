@@ -167,7 +167,6 @@ AcceptTC "docker-ce-edge"
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
 az group deployment create --template-file azuredeploy2.json  \
-    --name "$INITIALS-swarm" \
     --resource-group $RESOURCE_GROUP \
     --parameters $PARAMS \
     --parameters random=$UNIQUE initials=$INITIALS \
