@@ -7,6 +7,10 @@
     "lbId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
     "lbIpName": "[concat(variables('lbName'), '-ip')]",
     "lbIpDnsName": "[concat('applb-', uniqueString(resourceGroup().id))]",
+    "lbNatName": "[concat(resourceGroup().name, '-nat')]",
+    "lbNatId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbNatName'))]",
+    "lbNatFeIpConfigId": "[concat(variables('lbNatId'),'/frontendIPConfigurations/default')]",
+    "lbNatIpName": "[concat(variables('lbNatName'), '-ip')]",
     "channelTag": "edge",
     "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354"
   },
@@ -20,6 +24,19 @@
         "dnsSettings": {
           "domainNameLabel": "[variables('lbIpDnsName')]"
         },
+        "publicIPAllocationMethod": "Static"
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbNatIpName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
         "publicIPAllocationMethod": "Static"
       },
       "tags": {
@@ -67,6 +84,61 @@
         "channelTag": "[variables('channelTag')]",
         "provider": "[toUpper(variables('providerTag'))]"
       }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbNatName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('lbNatIpName'))]"
+      ],
+      "properties": {
+        "backendAddressPools": [
+          {
+            "name": "default"
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "default",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('lbNatIpName'))]"
+              }
+            }
+          }
+        ],
+        "inboundNatPools": [
+          {
+            "name": "default",
+            "properties": {
+              "backendPort": 22,
+              "frontendIPConfiguration": {
+                "id": "[variables('lbNatFeIpConfigId')]"
+              },
+              "frontendPortRangeStart": 50000,
+              "frontendPortRangeEnd": 50100,
+              "protocol": "tcp"
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "default",
+            "properties": {
+              "intervalInSeconds": 10,
+              "numberOfProbes": 2,
+              "port": 22,
+              "protocol": "Tcp"
+            }
+          }
+        ]
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
+      }
     }
   ],
   "outputs": {
@@ -75,6 +147,15 @@
       "value": {
         "id": "[variables('LBId')]",
         "name": "[variables('LBName')]"
+      }
+    },
+    "natLoadBalancer": {
+      "type": "object",
+      "value": {
+        "id": "[variables('lbNatName')]",
+        "name": "[variables('lbNatId')]",
+        "poolId": "[concat(variables('lbNatId'),'/inboundNatPools/default')]",
+        "bePoolId": "[concat(variables('lbNatId'),'/backendAddressPools/default')]",
       }
     }
   }
