@@ -220,7 +220,8 @@
       "apiVersion": "2017-05-10",
       "resourceGroup": "[variables('defaultGroup')]",
       "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
+        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]",
+        "TemplateRole"
       ],
       "properties": {
         "mode": "Incremental",
