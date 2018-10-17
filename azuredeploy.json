@@ -212,7 +212,7 @@
             "value": "Contributor"
           },
           "roleNameGuid": {
-            "value": "[guid(subscription().id)]"
+            "value": "[guid(concat(subscription().id), variables('defaultGroup'))]"
           }
         }
       }

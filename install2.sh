@@ -133,6 +133,6 @@ az deployment create --template-file azuredeploy2.json  \
     --location $AZURE_LOCATION \
     --parameters $PARAMS \
     --parameters random=$UNIQUE initials=$INITIALS \
-    --parameters servicePrincipalAppId=$CLIENT_ID \
-    --parameters servicePrincipalAppSecret=$CLIENT_SECRET \
+    --parameters servicePrincipalClientId=$CLIENT_ID \
+    --parameters servicePrincipalClientKey=$CLIENT_SECRET \
     --parameters servicePrincipalObjectId=$OBJECT_ID
