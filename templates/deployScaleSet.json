@@ -209,12 +209,12 @@
                         },
                         "loadBalancerBackendAddressPools": [
                           {
-                            "id": "[parameters('poolId')]"
+                            "id": "[parameters('bePoolId')]"
                           }
                         ],
                         "loadBalancerInboundNatPools": [
                           {
-                            "id": "[parameters('bePoolId')]"
+                            "id": "[parameters('poolId')]"
                           }
                         ]
                       }
