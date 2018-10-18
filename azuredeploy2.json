@@ -301,7 +301,7 @@
       }
     },
     {
-      "name": "TemplateManagerVMSS",
+      "name": "TemplateManagers",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
       "dependsOn": [
@@ -314,7 +314,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployScaleSet.json')]",
+          "uri": "[concat(parameters('templateURL'), 'deployVMss.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -356,6 +356,152 @@
           },
           "count": {
             "value": "[parameters('managerCount')]"
+          },
+          "adminUserName": {
+            "reference": {
+              "keyVault": {
+                "id": "[reference('TemplateKeyVault').outputs.keyVault.value.id]"
+              },
+              "secretName": "adminUserName"
+            }
+          },
+          "sshKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[reference('TemplateKeyVault').outputs.keyVault.value.id]"
+              },
+              "secretName": "sshPublicKey"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "TemplateManagers",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "dependsOn": [
+        "TemplateStorage",
+        "TemplateLogStorage",
+        "TemplateVNet",
+        "TemplateKeyVault",
+        "TemplateLoadBalancer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployVMss.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "name": {
+            "value": "swarm-manager-vmss"
+          },
+          "swarmRole": {
+            "value": "MANAGER"
+          },
+          "servicePrincipalAppId": {
+            "value": "[parameters('servicePrincipalClientId')]"
+          },
+          "servicePrincipalAppSecret": {
+            "value": "[parameters('servicePrincipalClientKey')]"
+          },
+          "storageAccount": {
+            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
+          },
+          "subnetId": {
+            "value": "[reference('TemplateVNet').outputs.subnets.value.subnetId]"
+          },
+          "lbName": {
+            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.name]"
+          },
+          "lbIp": {
+            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.ip]"
+          },
+          "poolId": {
+            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.poolId]"
+          },
+          "bePoolId": {
+            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.bePoolId]"
+          },
+          "size": {
+            "value": "[parameters('managerSize')]"
+          },
+          "count": {
+            "value": "[parameters('managerCount')]"
+          },
+          "adminUserName": {
+            "reference": {
+              "keyVault": {
+                "id": "[reference('TemplateKeyVault').outputs.keyVault.value.id]"
+              },
+              "secretName": "adminUserName"
+            }
+          },
+          "sshKey": {
+            "reference": {
+              "keyVault": {
+                "id": "[reference('TemplateKeyVault').outputs.keyVault.value.id]"
+              },
+              "secretName": "sshPublicKey"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "TemplateWorkers",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2017-05-10",
+      "dependsOn": [
+        "TemplateStorage",
+        "TemplateLogStorage",
+        "TemplateVNet",
+        "TemplateKeyVault",
+        "TemplateLoadBalancer"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(parameters('templateURL'), 'deployVMss.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "name": {
+            "value": "swarm-worker-vmss"
+          },
+          "swarmRole": {
+            "value": "WORKER"
+          },
+          "size": {
+            "value": "[parameters('workerSize')]"
+          },
+          "count": {
+            "value": "[parameters('workerCount')]"
+          },
+          "servicePrincipalAppId": {
+            "value": "[parameters('servicePrincipalClientId')]"
+          },
+          "servicePrincipalAppSecret": {
+            "value": "[parameters('servicePrincipalClientKey')]"
+          },
+          "storageAccount": {
+            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
+          },
+          "subnetId": {
+            "value": "[reference('TemplateVNet').outputs.subnets.value.subnetId]"
+          },
+          "lbName": {
+            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.name]"
+          },
+          "lbIp": {
+            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.ip]"
+          },
+          "poolId": {
+            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.poolId]"
+          },
+          "bePoolId": {
+            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.bePoolId]"
           },
           "adminUserName": {
             "reference": {

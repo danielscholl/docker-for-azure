@@ -1,212 +1,246 @@
 {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "prefix": {
-        "type": "string",
-        "metadata": {
-          "description": "Small unique string."
-        },
-        "minLength": 3,
-        "maxLength": 6
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "metadata": {
+        "description": "Virtual Machine Scale Set Name"
       },
-      "numberOfInstances": {
-        "type": "int",
-        "metadata": {
-          "description": "Number of VMs to deploy, min 2 max 5"
-        },
-        "minValue": 2,
-        "maxValue": 5
+      "type": "string"
+    },
+    "servicePrincipalAppId": {
+      "metadata": {
+        "description": "AD ServicePrincipal App ID"
       },
-      "vmName": {
-        "type": "string",
-        "metadata": {
-          "description": "Virtual Machine 1 Server Name."
-        },
-        "minLength": 2,
-        "maxLength": 2
+      "type": "string"
+    },
+    "servicePrincipalAppSecret": {
+      "metadata": {
+        "description": "AD ServicePrincipal App Secret"
       },
-      "vmSize": {
-        "type": "string",
-        "metadata": {
-          "description": "The virtual machine server size."
-        }
+      "type": "securestring"
+    },
+    "storageAccount": {
+      "metadata": {
+        "description": "Logs Storage Account Name"
       },
-      "vmStorageType": {
-        "type": "string",
-        "metadata": {
-          "description": "Type of Storage for Managed Disks"
-        },
-        "allowedValues": [
-          "Standard_LRS",
-          "Premium_LRS"
-        ],
-        "defaultValue": "Premium_LRS"
+      "type": "string"
+    },
+    "subnetId": {
+      "metadata": {
+        "description": "Virtual Network Subnet Id"
       },
-      "vnetGroup": {
-        "type": "string",
-        "metadata": {
-          "description": "Name of the existing VNET resource group"
-        }
+      "type": "string"
+    },
+    "lbName": {
+      "metadata": {
+        "description": "Load Balancer Name"
       },
-      "vnet": {
-        "type": "string",
-        "metadata": {
-          "description": "Name of the existing VNET"
-        }
-      },
-      "subnet": {
-        "type": "string",
-        "metadata": {
-          "description": "Subnet ID to associate VM to."
-        }
-      },
-      "adminUserName": {
-        "type": "string",
-        "metadata": {
-          "description": "Linux servers admin user account name."
-        },
-        "defaultValue": "azureuser",
-        "minLength": 1
-      },
-      "adminPassword": {
-        "type": "string",
-        "metadata": {
-          "description": "Admin user account password."
-        }
-      },
-      "WindowsOSVersion": {
-        "type": "string",
-        "metadata": {
-          "description": "The Windows version for the VM."
-        },
-        "defaultValue": "2016-Datacenter",
-        "allowedValues": [
-          "2008-R2-SP1",
-          "2012-Datacenter",
-          "2012-R2-Datacenter",
-          "2016-Nano-Server",
-          "2016-Datacenter-with-Containers",
-          "2016-Datacenter"
-        ]
-      },
-      "managedImageId": {
-        "type": "string"
-      },
-      "diagnosticsStorageName": {
-        "type": "string",
-        "metadata": {
-          "description": "Diagnostics Storage Account Name"
-        }
-      },
-      "diagnosticsStorageKey": {
-        "type": "string",
-        "metadata": {
-          "description": "Diagnostics Storage Account Key"
-        }
-      },
-      "domain": {
-        "type": "string",
-        "metadata": {
-          "description": "The FQDN of the AD domain"
-        }
-      },
-      "domainAdmin": {
-        "type": "string",
-        "metadata": {
-          "description": "Domain Admin Account Name also used as Local Machine Admin User"
-        }
-      },
-      "domainPassword": {
-        "type": "securestring",
-        "metadata": {
-          "description": "Domain Admin Account Password also used as Local Machine Admin User Password"
-        }
+      "type": "string"
+    },
+    "lbIP": {
+      "type": "string",
+      "metadata": {
+        "description": "Load Balancer IP"
       }
     },
-    "variables": {
-      "cleanPrefix": "[toLower(parameters('prefix'))]",
-      "vnetID": "[resourceId(parameters('vnetGroup'), 'Microsoft.Network/virtualNetworks', parameters('vnet'))]",
-      "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
-    },
-    "resources": [{
-      "comments": "## VM Scale Set ##",
-      "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "name": "[concat(variables('cleanPrefix'), '-', parameters('vmName'))]",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "2016-04-30-preview",
-      "tags": {
-        "Company": "[parameters('prefix')]"
+    "poolId": {
+      "metadata": {
+        "description": "Load Balancer Nat Pool ID"
       },
-      "dependsOn": [],
+      "type": "string"
+    },
+    "bePoolId": {
+      "metadata": {
+        "description": "Load Balancer Backend Nat Pool ID"
+      },
+      "type": "string"
+    },
+    "size": {
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2",
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_D2s_v3",
+        "Standard_D4s_v3"
+      ],
+      "defaultValue": "Standard_D2_v2",
+      "metadata": {
+        "description": "The size of the Swarm manager VMs"
+      },
+      "type": "string"
+    },
+    "count": {
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Linux VMs"
+      },
+      "type": "int"
+    },
+    "adminUserName": {
+      "defaultValue": "docker",
+      "type": "string",
+      "metadata": {
+        "description": "User name for the Linux Virtual Machines."
+      }
+    },
+    "sshKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The SSH public key used to authenticate with the created swarm. Usually available in $HOME/.ssh/id_rsa.pub file"
+      }
+    },
+    "swarmRole": {
+      "type": "string",
+      "metadata": {
+        "description": "Role in the Swarm"
+      },
+      "allowedValues": [
+        "MANAGER",
+        "WORKER"
+      ]
+    }
+  },
+  "variables": {
+    "linuxImageOffer": "docker-ce-edge",
+    "linuxImagePublisher": "docker",
+    "linuxImageSku": "docker-ce-edge",
+    "linuxImageVersion": "1.0.7",
+    "sshKeyPath": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]",
+    "customData": "[concat('export ACCOUNT_ID=\"', subscription().subscriptionId, '\"', '\n', 'export SUB_ID=\"', subscription().subscriptionId, '\"', '\n', 'export GROUP_NAME=\"', resourceGroup().name, '\"', '\n', 'export LB_NAME=\"', parameters('lbName'), '\"', '\n', 'export APP_ID=\"', parameters('servicePrincipalAppId'), '\"', '\n', 'export APP_SECRET=\"', parameters('servicePrincipalAppSecret'), '\"', '\n', 'export TENANT_ID=\"', subscription().tenantId, '\"', '\n', 'export SWARM_INFO_STORAGE_ACCOUNT=\"', parameters('storageAccount'), '\"', '\n', 'export SWARM_LOGS_STORAGE_ACCOUNT=\"', parameters('storageAccount'), '\"', '\n', 'export PRIVATE_IP=$(ifconfig eth0 | grep \"inet addr:\" | cut -d: -f2 | cut -d\" \" -f1)\n', 'export AZURE_HOSTNAME=$(hostname)\n', '\n', 'docker run --label com.docker.editions.system --log-driver=json-file --restart=no -it -e LB_NAME -e SUB_ID -e ROLE -e TENANT_ID -e APP_ID -e APP_SECRET -e ACCOUNT_ID -e GROUP_NAME -e PRIVATE_IP -e DOCKER_FOR_IAAS_VERSION -e SWARM_INFO_STORAGE_ACCOUNT -e SWARM_LOGS_STORAGE_ACCOUNT -e AZURE_HOSTNAME -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -v /var/log:/var/log docker4x/init-azure:\"$DOCKER_FOR_IAAS_VERSION\"\n')]",
+    "channelTag": "edge",
+    "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2017-03-30",
+      "name": "[parameters('name')]",
+      "location": "[resourceGroup().location]",
       "sku": {
-        "name": "[parameters('vmSize')]",
-        "tier": "Standard",
-        "capacity": "[parameters('numberOfInstances')]"
+        "capacity": "[parameters('count')]",
+        "name": "[parameters('size')]",
+        "tier": "Standard"
+      },
+      "plan": {
+        "name": "[variables('linuxImageSku')]",
+        "product": "[variables('linuxImageOffer')]",
+        "publisher": "[variables('linuxImagePublisher')]"
       },
       "properties": {
         "overprovision": false,
-        "singlePlacementGroup": true,
         "upgradePolicy": {
           "mode": "Manual"
         },
         "virtualMachineProfile": {
           "storageProfile": {
             "imageReference": {
-              "id": "[parameters('managedImageId')]"
+              "offer": "[variables('linuxImageOffer')]",
+              "publisher": "[variables('linuxImagePublisher')]",
+              "sku": "[variables('linuxImageSku')]",
+              "version": "[variables('linuxImageVersion')]"
             },
             "osDisk": {
               "createOption": "FromImage",
-              "managedDisk": {
-                "storageAccountType": "[parameters('vmStorageType')]"
-              },
-              "caching": "ReadOnly"
+              "diskSizeGB": 100
             }
-          },
-          "osProfile": {
-            "computerNamePrefix": "[concat(variables('cleanPrefix'), '-', parameters('vmName'))]",
-            "adminUsername": "[parameters('adminUsername')]",
-            "adminPassword": "[parameters('adminPassword')]"
-          },
-          "networkProfile": {
-            "networkInterfaceConfigurations": [{
-              "name": "[concat(parameters('vmName'), '-nic')]",
-              "properties": {
-                "primary": true,
-                "ipConfigurations": [{
-                  "name": "ipconfig",
-                  "properties": {
-                    "subnet": {
-                      "id": "[variables('subnetRef')]"
-                    }
-                  }
-                }]
-              }
-            }]
           },
           "diagnosticsProfile": {
             "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[concat('http://', parameters('diagnosticsStorageName'), '.blob.core.windows.net')]"
+              "storageUri": "[concat('http://', parameters('storageAccount'), '.blob.core.windows.net')]"
             }
           },
-          "extensionProfile": {
-            "extensions": [{
-                "name": "[concat(parameters('vmName'),'BGInfo')]",
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nodeNic",
                 "properties": {
-                  "publisher": "Microsoft.Compute",
-                  "type": "BGInfo",
-                  "typeHandlerVersion": "2.1",
-                  "autoUpgradeMinorVersion": true,
-                  "settings": {},
-                  "protectedSettings": {}
+                  "primary": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig",
+                      "privateIPAllocationMethod": "dynamic",
+                      "properties": {
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        },
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[parameters('bePoolId')]"
+                          }
+                        ],
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[if(equals(parameters('swarmRole'), 'MANAGER'), parameters('poolId'), json('null'))]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
                 }
               }
             ]
+          },
+          "osProfile": {
+            "computerNamePrefix": "[parameters('name')]",
+            "adminUsername": "[parameters('adminUserName')]",
+            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', parameters('swarmRole'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "keyData": "[parameters('sshKey')]",
+                    "path": "[variables('sshKeyPath')]"
+                  }
+                ]
+              }
+            }
           }
         }
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
       }
-    }],
-    "outputs": {}
-  }
-  
+    }
+  ],
+  "outputs": {}
+}
