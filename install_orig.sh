@@ -16,15 +16,11 @@ if [ -f ./.envrc ]; then source ./.envrc; fi
 
 if [ ! -z $1 ]; then INITIALS=$1; fi
 if [ -z $INITIALS ]; then
-  INITIALS="iac"
+  INITIALS="demo"
 fi
 
 if [ -z $AZURE_LOCATION ]; then
   AZURE_LOCATION="eastus"
-fi
-
-if [ -z $AZURE_SUBSCRIPTION ]; then
-  AZURE_SUBSCRIPTION=$(az account show --query id -otsv)
 fi
 
 
@@ -32,38 +28,9 @@ fi
 ###############################
 ## FUNCTIONS                 ##
 ###############################
-function CreateResourceGroup() {
-  # Required Argument $1 = RESOURCE_GROUP
-  # Required Argument $2 = LOCATION
-
-  if [ -z $1 ]; then
-    tput setaf 1; echo 'ERROR: Argument $1 (RESOURCE_GROUP) not received'; tput sgr0
-    exit 1;
-  fi
-  if [ -z $2 ]; then
-    tput setaf 1; echo 'ERROR: Argument $2 (LOCATION) not received'; tput sgr0
-    exit 1;
-  fi
-
-  local _result=$(az group show --name $1)
-  if [ "$_result"  == "" ]
-    then
-      OUTPUT=$(az group create --name $1 \
-        --location $2 \
-        --tags contact=$INITIALS \
-        -ojsonc)
-    else
-      tput setaf 3;  echo "Resource Group $1 already exists."; tput sgr0
-    fi
-}
 
 function CreateServicePrincipal() {
     # Required Argument $1 = PRINCIPAL_NAME
-
-    # Create with customized contributor assignments.
-    #     az ad sp create-for-rbac -n "MyApp" --role contributor \
-    #         --scopes /subscriptions/{SubID}/resourceGroups/{ResourceGroup1} \
-    #         /subscriptions/{SubID}/resourceGroups/{ResourceGroup2}
 
     if [ -z $1 ]; then
         tput setaf 1; echo 'ERROR: Argument $1 (PRINCIPAL_NAME) not received'; tput sgr0
@@ -73,19 +40,16 @@ function CreateServicePrincipal() {
     local _result=$(az ad sp list --display-name $1 --query [].appId -otsv)
     if [ "$_result"  == "" ]
     then
-      # CLIENT_SECRET=$(az ad sp create-for-rbac \
-      #   --name $1 \
-      #   --skip-assignment \
-      #   --query password -otsv)
       CLIENT_SECRET=$(az ad sp create-for-rbac \
         --name $1 \
-        --role contributor \
-        --scopes /subscriptions/$AZURE_SUBSCRIPTION/resourceGroups/$RESOURCE_GROUP \
+        --skip-assignment \
         --query password -otsv)
       CLIENT_ID=$(az ad sp list \
         --display-name $1 \
         --query [].appId -otsv)
-      OBJECT_ID=$(az ad app show --id $CLIENT_ID --query objectId -otsv)
+      OBJECT_ID=$(az ad sp list \
+        --display-name $1 \
+        --query [].objectId -otsv)
       UNIQUE=$(echo $RANDOM | cut -c 1-3)
 
 
@@ -148,9 +112,6 @@ function AcceptTC() {
 ###############################
 ## Azure Intialize           ##
 ###############################
-tput setaf 2; echo 'Creating Resource Group...' ; tput sgr0
-RESOURCE_GROUP="$INITIALS-swarm"
-CreateResourceGroup $RESOURCE_GROUP $AZURE_LOCATION
 
 tput setaf 2; echo 'Creating Service Principal and Role Assignment...' ; tput sgr0
 PRINCIPAL_NAME="$INITIALS-swarm-principal"
@@ -161,15 +122,17 @@ AZURE_USER=$(az account show --query user.name -otsv)
 LINUX_USER=(${AZURE_USER//@/ })
 CreateSSHKeys $AZURE_USER
 
+
 tput setaf 2; echo 'Accepting Marketplace Terms and Conditions...' ; tput sgr0
 AcceptTC "docker-ce-edge"
 
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
-az group deployment create --template-file azuredeploy2.json  \
-    --resource-group $RESOURCE_GROUP \
+az deployment create --template-file azuredeploy.json  \
+    --name "$INITIALS-swarm" \
+    --location $AZURE_LOCATION \
     --parameters $PARAMS \
     --parameters random=$UNIQUE initials=$INITIALS \
-    --parameters servicePrincipalClientId=$CLIENT_ID \
-    --parameters servicePrincipalClientKey=$CLIENT_SECRET \
+    --parameters servicePrincipalAppId=$CLIENT_ID \
+    --parameters servicePrincipalAppSecret=$CLIENT_SECRET \
     --parameters servicePrincipalObjectId=$OBJECT_ID
