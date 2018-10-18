@@ -147,7 +147,7 @@
       "value": {
         "id": "[variables('LBId')]",
         "name": "[variables('LBName')]",
-        "ip": "[reference(variables('lbIpName')).ipAddress]"
+        "ip":"[reference(variables('lbIpName')).ipAddress]"
       }
     },
     "natLoadBalancer": {
