@@ -26,6 +26,12 @@
       },
       "type": "string"
     },
+    "logStorageAccountUri": {
+      "metadata": {
+        "description": "Logs Storage Account Uri"
+      },
+      "type": "string"
+    },
     "vhdStorageAccount": {
       "metadata": {
         "description": "VHD Storage Account Name"
@@ -186,7 +192,7 @@
           "diagnosticsProfile": {
             "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[reference(concat('Microsoft.Storage/storageAccounts/', parameters('logStorageAccount'))).primaryEndpoints.blob]"
+              "storageUri": "[parameters('logStorageAccountUri')]"
             }
           },
           "networkProfile": {

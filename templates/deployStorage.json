@@ -64,7 +64,8 @@
       "value": {
         "id": "[variables('storageId')]",
         "name": "[variables('storageAccountName')]",
-        "key": "[listKeys(variables('storageId'), '2016-01-01').keys[0].value]"
+        "key": "[listKeys(variables('storageId'), '2016-01-01').keys[0].value]",
+        "uri": "[reference(concat('Microsoft.Storage/storageAccounts/', variables('storageAccountName'))).primaryEndpoints.blob]"
       }
     }
   }

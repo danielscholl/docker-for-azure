@@ -308,7 +308,7 @@
         "TemplateStorage",
         "TemplateLogStorage",
         "TemplateVNet",
-        "TemplatePrivateKeyVault",
+        "TemplateKeyVault",
         "TemplateLoadBalancer"
       ],
       "properties": {
@@ -324,14 +324,17 @@
           "swarmRole": {
             "value": "MANAGER"
           },
-          "servicePrincipalClientId": {
+          "servicePrincipalAppId": {
             "value": "[parameters('servicePrincipalClientId')]"
           },
-          "servicePrincipalClientKey": {
+          "servicePrincipalAppSecret": {
             "value": "[parameters('servicePrincipalClientKey')]"
           },
           "logStorageAccount": {
             "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
+          },
+          "logStorageAccountUri": {
+            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.uri]"
           },
           "vhdStorageAccount": {
             "value": "[reference('TemplateStorage').outputs.storageAccount.value.name]"
@@ -346,7 +349,7 @@
             "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.name]"
           },
           "lbId": {
-            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.name]"
+            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.id]"
           },
           "poolId": {
             "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.poolId]"
@@ -371,7 +374,7 @@
           "sshKey": {
             "reference": {
               "keyVault": {
-                "id": "[reference('TemplatePrivateKeyVault').outputs.keyVault.value.id]"
+                "id": "[reference('TemplateKeyVault').outputs.keyVault.value.id]"
               },
               "secretName": "sshPublicKey"
             }
