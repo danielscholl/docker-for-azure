@@ -155,7 +155,7 @@
         "id": "[variables('lbNatName')]",
         "name": "[variables('lbNatId')]",
         "poolId": "[concat(variables('lbNatId'),'/inboundNatPools/default')]",
-        "bePoolId": "[concat(variables('lbNatId'),'/backendAddressPools/default')]",
+        "bePoolId": "[concat(variables('lbNatId'),'/backendAddressPools/default')]"
       }
     }
   }
