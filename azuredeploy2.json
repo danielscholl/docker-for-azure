@@ -333,23 +333,17 @@
           "logStorageAccount": {
             "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
           },
-          "logStorageAccountUri": {
-            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.uri]"
-          },
-          "vhdStorageAccount": {
-            "value": "[reference('TemplateStorage').outputs.storageAccount.value.name]"
-          },
           "swarmInfoStorageAccount": {
             "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
           },
           "subnetId": {
-            "value": "[reference('TemplateVNet').outputs.subnets.value.subnet1Id]"
+            "value": "[reference('TemplateVNet').outputs.subnets.value.subnetId]"
           },
           "lbName": {
             "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.name]"
           },
-          "lbId": {
-            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.id]"
+          "lbIp": {
+            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.ip]"
           },
           "poolId": {
             "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.poolId]"

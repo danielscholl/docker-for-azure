@@ -26,18 +26,6 @@
       },
       "type": "string"
     },
-    "logStorageAccountUri": {
-      "metadata": {
-        "description": "Logs Storage Account Uri"
-      },
-      "type": "string"
-    },
-    "vhdStorageAccount": {
-      "metadata": {
-        "description": "VHD Storage Account Name"
-      },
-      "type": "string"
-    },
     "swarmInfoStorageAccount": {
       "metadata": {
         "description": "Storage Account for Control Plane"
@@ -55,6 +43,12 @@
         "description": "Load Balancer Name"
       },
       "type": "string"
+    },
+    "lbIP": {
+      "type": "string",
+      "metadata": {
+        "description": "Load Balancer IP"
+      }
     },
     "poolId": {
       "metadata": {
@@ -138,12 +132,6 @@
         "description": "The SSH public key used to authenticate with the created swarm. Usually available in $HOME/.ssh/id_rsa.pub file"
       }
     },
-    "lbId": {
-      "type": "string",
-      "metadata": {
-        "description": "Load Balancer Id"
-      }
-    },
     "swarmRole": {
       "type": "string",
       "metadata": {
@@ -156,17 +144,10 @@
     }
   },
   "variables": {
-    "vhdContainerName": "dockervhd",
     "linuxImageOffer": "docker-ce-edge",
     "linuxImagePublisher": "docker",
     "linuxImageSku": "docker-ce-edge",
     "linuxImageVersion": "1.0.7",
-    "linuxImageReference": {
-      "offer": "[variables('linuxImageOffer')]",
-      "publisher": "[variables('linuxImagePublisher')]",
-      "sku": "[variables('linuxImageSku')]",
-      "version": "[variables('linuxImageVersion')]"
-    },
     "sshKeyPath": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]",
     "customData": "[concat('export ACCOUNT_ID=\"', subscription().subscriptionId, '\"', '\n', 'export SUB_ID=\"', subscription().subscriptionId, '\"', '\n', 'export GROUP_NAME=\"', resourceGroup().name, '\"', '\n', 'export LB_NAME=\"', parameters('lbName'), '\"', '\n', 'export APP_ID=\"', parameters('servicePrincipalAppId'), '\"', '\n', 'export APP_SECRET=\"', parameters('servicePrincipalAppSecret'), '\"', '\n', 'export TENANT_ID=\"', subscription().tenantId, '\"', '\n', 'export SWARM_INFO_STORAGE_ACCOUNT=\"', parameters('swarmInfoStorageAccount'), '\"', '\n', 'export SWARM_LOGS_STORAGE_ACCOUNT=\"', parameters('logStorageAccount'), '\"', '\n', 'export PRIVATE_IP=$(ifconfig eth0 | grep \"inet addr:\" | cut -d: -f2 | cut -d\" \" -f1)\n', 'export AZURE_HOSTNAME=$(hostname)\n', '\n', 'docker run --label com.docker.editions.system --log-driver=json-file --restart=no -it -e LB_NAME -e SUB_ID -e ROLE -e TENANT_ID -e APP_ID -e APP_SECRET -e ACCOUNT_ID -e GROUP_NAME -e PRIVATE_IP -e DOCKER_FOR_IAAS_VERSION -e SWARM_INFO_STORAGE_ACCOUNT -e SWARM_LOGS_STORAGE_ACCOUNT -e AZURE_HOSTNAME -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -v /var/log:/var/log docker4x/init-azure:\"$DOCKER_FOR_IAAS_VERSION\"\n')]",
     "channelTag": "edge",
@@ -178,6 +159,11 @@
       "apiVersion": "2017-03-30",
       "name": "[parameters('name')]",
       "location": "[resourceGroup().location]",
+      "sku": {
+        "capacity": "[parameters('count')]",
+        "name": "[parameters('size')]",
+        "tier": "Standard"
+      },
       "plan": {
         "name": "[variables('linuxImageSku')]",
         "product": "[variables('linuxImageOffer')]",
@@ -189,10 +175,22 @@
           "mode": "Manual"
         },
         "virtualMachineProfile": {
+          "storageProfile": {
+            "imageReference": {
+              "offer": "[variables('linuxImageOffer')]",
+              "publisher": "[variables('linuxImagePublisher')]",
+              "sku": "[variables('linuxImageSku')]",
+              "version": "[variables('linuxImageVersion')]"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "diskSizeGB": 100
+            }
+          },
           "diagnosticsProfile": {
             "bootDiagnostics": {
               "enabled": true,
-              "storageUri": "[parameters('logStorageAccountUri')]"
+              "storageUri": "[concat('http://', parameters('logStorageAccount'), '.blob.core.windows.net')]"
             }
           },
           "networkProfile": {
@@ -200,11 +198,15 @@
               {
                 "name": "managerNodeNic",
                 "properties": {
+                  "primary": true,
                   "ipConfigurations": [
                     {
                       "name": "mgripconfig",
                       "privateIPAllocationMethod": "dynamic",
                       "properties": {
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        },
                         "loadBalancerBackendAddressPools": [
                           {
                             "id": "[parameters('poolId')]"
@@ -214,22 +216,18 @@
                           {
                             "id": "[parameters('bePoolId')]"
                           }
-                        ],
-                        "subnet": {
-                          "id": "[parameters('subnetId')]"
-                        }
+                        ]
                       }
                     }
-                  ],
-                  "primary": true
+                  ]
                 }
               }
             ]
           },
           "osProfile": {
-            "adminUsername": "[parameters('adminUserName')]",
             "computerNamePrefix": "[parameters('name')]",
-            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', parameters('swarmRole'), '\"', '\n', 'export LB_IP=\"', reference(parameters('lbId')).ipAddress, '\"', '\n', variables('customData')))]",
+            "adminUsername": "[parameters('adminUserName')]",
+            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', parameters('swarmRole'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
             "linuxConfiguration": {
               "disablePasswordAuthentication": true,
               "ssh": {
@@ -241,24 +239,8 @@
                 ]
               }
             }
-          },
-          "storageProfile": {
-            "imageReference": "[variables('linuxImageReference')]",
-            "osDisk": {
-              "caching": "ReadWrite",
-              "createOption": "FromImage",
-              "name": "[concat(parameters('name'), 'vmssosdisk')]",
-              "vhdContainers": [
-                "[concat(reference(concat('Microsoft.Storage/storageAccounts/', parameters('vhdStorageAccount'))).primaryEndpoints.blob, variables('vhdContainerName'))]"
-              ]
-            }
           }
         }
-      },
-      "sku": {
-        "capacity": "[parameters('count')]",
-        "name": "[parameters('size')]",
-        "tier": "Standard"
       },
       "tags": {
         "channelTag": "[variables('channelTag')]",

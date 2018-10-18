@@ -62,8 +62,8 @@
     "subnets": {
       "type": "object",
       "value": {
-        "subnet1Name": "[variables('SubnetName')]",
-        "subnet1Id": "[variables('subnetId')]"
+        "subnetName": "[variables('SubnetName')]",
+        "subnetId": "[variables('subnetId')]"
       }
     }
   }
