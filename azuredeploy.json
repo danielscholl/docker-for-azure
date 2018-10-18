@@ -395,7 +395,8 @@
         "TemplateLogStorage",
         "TemplateVNet",
         "TemplateKeyVault",
-        "TemplateLoadBalancer"
+        "TemplateLoadBalancer",
+        "TemplateManagers"
       ],
       "properties": {
         "mode": "Incremental",
