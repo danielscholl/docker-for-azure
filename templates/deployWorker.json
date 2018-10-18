@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "name": {
-      "metadata": {
-        "description": "Virtual Machine Scale Set Name"
-      },
-      "type": "string"
-    },
     "servicePrincipalAppId": {
       "metadata": {
         "description": "AD ServicePrincipal App ID"
@@ -43,12 +37,6 @@
       "metadata": {
         "description": "Load Balancer IP"
       }
-    },
-    "poolId": {
-      "metadata": {
-        "description": "Load Balancer Nat Pool ID"
-      },
-      "type": "string"
     },
     "bePoolId": {
       "metadata": {
@@ -125,19 +113,11 @@
       "metadata": {
         "description": "The SSH public key used to authenticate with the created swarm. Usually available in $HOME/.ssh/id_rsa.pub file"
       }
-    },
-    "swarmRole": {
-      "type": "string",
-      "metadata": {
-        "description": "Role in the Swarm"
-      },
-      "allowedValues": [
-        "MANAGER",
-        "WORKER"
-      ]
     }
   },
   "variables": {
+    "name": "swarm-worker-vmss",
+    "role": "WORKER",
     "linuxImageOffer": "docker-ce-edge",
     "linuxImagePublisher": "docker",
     "linuxImageSku": "docker-ce-edge",
@@ -151,7 +131,7 @@
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "apiVersion": "2017-03-30",
-      "name": "[parameters('name')]",
+      "name": "[variables('name')]",
       "location": "[resourceGroup().location]",
       "sku": {
         "capacity": "[parameters('count')]",
@@ -205,11 +185,6 @@
                           {
                             "id": "[parameters('bePoolId')]"
                           }
-                        ],
-                        "loadBalancerInboundNatPools": [
-                          {
-                            "id": "[if(equals(parameters('swarmRole'), 'MANAGER'), parameters('poolId'), json('null'))]"
-                          }
                         ]
                       }
                     }
@@ -219,9 +194,9 @@
             ]
           },
           "osProfile": {
-            "computerNamePrefix": "[parameters('name')]",
+            "computerNamePrefix": "[variables('name')]",
             "adminUsername": "[parameters('adminUserName')]",
-            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', parameters('swarmRole'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
+            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', variables('role'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
             "linuxConfiguration": {
               "disablePasswordAuthentication": true,
               "ssh": {

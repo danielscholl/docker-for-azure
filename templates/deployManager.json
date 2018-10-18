@@ -1,0 +1,232 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "servicePrincipalAppId": {
+      "metadata": {
+        "description": "AD ServicePrincipal App ID"
+      },
+      "type": "string"
+    },
+    "servicePrincipalAppSecret": {
+      "metadata": {
+        "description": "AD ServicePrincipal App Secret"
+      },
+      "type": "securestring"
+    },
+    "storageAccount": {
+      "metadata": {
+        "description": "Logs Storage Account Name"
+      },
+      "type": "string"
+    },
+    "subnetId": {
+      "metadata": {
+        "description": "Virtual Network Subnet Id"
+      },
+      "type": "string"
+    },
+    "lbName": {
+      "metadata": {
+        "description": "Load Balancer Name"
+      },
+      "type": "string"
+    },
+    "lbIP": {
+      "type": "string",
+      "metadata": {
+        "description": "Load Balancer IP"
+      }
+    },
+    "natPoolId": {
+      "metadata": {
+        "description": "Load Balancer Nat Pool ID"
+      },
+      "type": "string"
+    },
+    "bePoolId": {
+      "metadata": {
+        "description": "Load Balancer Backend Nat Pool ID"
+      },
+      "type": "string"
+    },
+    "size": {
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2",
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_D2s_v3",
+        "Standard_D4s_v3"
+      ],
+      "defaultValue": "Standard_D2_v2",
+      "metadata": {
+        "description": "The size of the Swarm manager VMs"
+      },
+      "type": "string"
+    },
+    "count": {
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Linux VMs"
+      },
+      "type": "int"
+    },
+    "adminUserName": {
+      "defaultValue": "docker",
+      "type": "string",
+      "metadata": {
+        "description": "User name for the Linux Virtual Machines."
+      }
+    },
+    "sshKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The SSH public key used to authenticate with the created swarm. Usually available in $HOME/.ssh/id_rsa.pub file"
+      }
+    }
+  },
+  "variables": {
+    "name": "swarm-manager-vmss",
+    "role": "MANAGER",
+    "linuxImageOffer": "docker-ce-edge",
+    "linuxImagePublisher": "docker",
+    "linuxImageSku": "docker-ce-edge",
+    "linuxImageVersion": "1.0.7",
+    "sshKeyPath": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]",
+    "customData": "[concat('export ACCOUNT_ID=\"', subscription().subscriptionId, '\"', '\n', 'export SUB_ID=\"', subscription().subscriptionId, '\"', '\n', 'export GROUP_NAME=\"', resourceGroup().name, '\"', '\n', 'export LB_NAME=\"', parameters('lbName'), '\"', '\n', 'export APP_ID=\"', parameters('servicePrincipalAppId'), '\"', '\n', 'export APP_SECRET=\"', parameters('servicePrincipalAppSecret'), '\"', '\n', 'export TENANT_ID=\"', subscription().tenantId, '\"', '\n', 'export SWARM_INFO_STORAGE_ACCOUNT=\"', parameters('storageAccount'), '\"', '\n', 'export SWARM_LOGS_STORAGE_ACCOUNT=\"', parameters('storageAccount'), '\"', '\n', 'export PRIVATE_IP=$(ifconfig eth0 | grep \"inet addr:\" | cut -d: -f2 | cut -d\" \" -f1)\n', 'export AZURE_HOSTNAME=$(hostname)\n', '\n', 'docker run --label com.docker.editions.system --log-driver=json-file --restart=no -it -e LB_NAME -e SUB_ID -e ROLE -e TENANT_ID -e APP_ID -e APP_SECRET -e ACCOUNT_ID -e GROUP_NAME -e PRIVATE_IP -e DOCKER_FOR_IAAS_VERSION -e SWARM_INFO_STORAGE_ACCOUNT -e SWARM_LOGS_STORAGE_ACCOUNT -e AZURE_HOSTNAME -v /var/run/docker.sock:/var/run/docker.sock -v /var/lib/docker:/var/lib/docker -v /var/log:/var/log docker4x/init-azure:\"$DOCKER_FOR_IAAS_VERSION\"\n')]",
+    "channelTag": "edge",
+    "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2017-03-30",
+      "name": "[variables('name')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "capacity": "[parameters('count')]",
+        "name": "[parameters('size')]",
+        "tier": "Standard"
+      },
+      "plan": {
+        "name": "[variables('linuxImageSku')]",
+        "product": "[variables('linuxImageOffer')]",
+        "publisher": "[variables('linuxImagePublisher')]"
+      },
+      "properties": {
+        "overprovision": false,
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "imageReference": {
+              "offer": "[variables('linuxImageOffer')]",
+              "publisher": "[variables('linuxImagePublisher')]",
+              "sku": "[variables('linuxImageSku')]",
+              "version": "[variables('linuxImageVersion')]"
+            },
+            "osDisk": {
+              "createOption": "FromImage",
+              "diskSizeGB": 100
+            }
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true,
+              "storageUri": "[concat('http://', parameters('storageAccount'), '.blob.core.windows.net')]"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nodeNic",
+                "properties": {
+                  "primary": true,
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig",
+                      "privateIPAllocationMethod": "dynamic",
+                      "properties": {
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        },
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[parameters('bePoolId')]"
+                          }
+                        ],
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[parameters('natPoolId')]"
+                          }
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "osProfile": {
+            "computerNamePrefix": "[variables('name')]",
+            "adminUsername": "[parameters('adminUserName')]",
+            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', variables('role'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "keyData": "[parameters('sshKey')]",
+                    "path": "[variables('sshKeyPath')]"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]"
+      }
+    }
+  ],
+  "outputs": {}
+}
