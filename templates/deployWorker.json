@@ -170,12 +170,12 @@
           "networkProfile": {
             "networkInterfaceConfigurations": [
               {
-                "name": "nodeNic",
+                "name": "workerNodeNic",
                 "properties": {
                   "primary": true,
                   "ipConfigurations": [
                     {
-                      "name": "ipconfig",
+                      "name": "nicipconfig",
                       "privateIPAllocationMethod": "dynamic",
                       "properties": {
                         "subnet": {
