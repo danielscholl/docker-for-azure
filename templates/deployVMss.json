@@ -26,30 +26,6 @@
       },
       "type": "string"
     },
-    "lbName": {
-      "metadata": {
-        "description": "Load Balancer Name"
-      },
-      "type": "string"
-    },
-    "lbIP": {
-      "type": "string",
-      "metadata": {
-        "description": "Load Balancer IP"
-      }
-    },
-    "natPoolId": {
-      "metadata": {
-        "description": "Load Balancer Nat Pool ID"
-      },
-      "type": "string"
-    },
-    "bePoolId": {
-      "metadata": {
-        "description": "Load Balancer Backend Nat Pool ID"
-      },
-      "type": "string"
-    },
     "size": {
       "allowedValues": [
         "Standard_A0",
@@ -121,14 +97,139 @@
       }
     }
   },
-  "variables": {},
+  "variables": {
+    
+    
+
+    "lbIpName": "[concat(variables('lbName'), '-ip')]",
+    "lbIpDnsName": "[concat('applb-', uniqueString(resourceGroup().id))]",
+    "lbName": "[concat(resourceGroup().name, '-lb')]",
+    "lbId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbName'))]",
+    "lbBePoolId": "[concat(variables('lbId'),'/backendAddressPools/default')]",
+    "lbNatName": "[concat(resourceGroup().name, '-nat')]",
+    "lbNatId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbNatName'))]",
+    "lbNatFeIpConfigId": "[concat(variables('lbNatId'),'/frontendIPConfigurations/default')]",
+    "lbNatIpName": "[concat(variables('lbNatName'), '-ip')]"
+  },
   "resources": [
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbIpName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "dnsSettings": {
+          "domainNameLabel": "[variables('lbIpDnsName')]"
+        },
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbNatIpName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('lbIpName'))]"
+      ],
+      "properties": {
+        "backendAddressPools": [
+          {
+            "name": "default"
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "default",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('lbIpName'))]"
+              }
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "default",
+            "properties": {
+              "intervalInSeconds": 10,
+              "numberOfProbes": 2,
+              "port": 44554,
+              "protocol": "Tcp"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbNatName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('lbNatIpName'))]"
+      ],
+      "properties": {
+        "backendAddressPools": [
+          {
+            "name": "default"
+          }
+        ],
+        "frontendIPConfigurations": [
+          {
+            "name": "default",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses', variables('lbNatIpName'))]"
+              }
+            }
+          }
+        ],
+        "inboundNatPools": [
+          {
+            "name": "default",
+            "properties": {
+              "backendPort": 22,
+              "frontendIPConfiguration": {
+                "id": "[variables('lbNatFeIpConfigId')]"
+              },
+              "frontendPortRangeStart": 50000,
+              "frontendPortRangeEnd": 50100,
+              "protocol": "tcp"
+            }
+          }
+        ],
+        "probes": [
+          {
+            "name": "default",
+            "properties": {
+              "intervalInSeconds": 10,
+              "numberOfProbes": 2,
+              "port": 22,
+              "protocol": "Tcp"
+            }
+          }
+        ]
+      }
+    },
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "apiVersion": "2017-03-30",
       "name": "swarm-manager-vmss",
       "location": "[resourceGroup().location]",
-      "dependsOn": [ ],
+      "dependsOn": [
+        "[variables('lbId')]",
+        "[variables('lbNatId')]"
+      ],
       "plan": {
         "name": "docker-ce-edge",
         "product": "docker-ce-edge",
@@ -152,12 +253,12 @@
                       "properties": {
                         "loadBalancerBackendAddressPools": [
                           {
-                            "id": "[parameters('bePoolId')]"
+                            "id": "[variables('lbBePoolId')]"
                           }
                         ],
                         "loadBalancerInboundNatPools": [
                           {
-                            "id": "[parameters('natPoolId')]"
+                            "id": "[variables('lbNatId')]"
                           }
                         ],
                         "subnet": {
@@ -211,7 +312,10 @@
       "apiVersion": "2017-03-30",
       "name": "swarm-worker-vmss",
       "location": "[resourceGroup().location]",
-      "dependsOn": [ ],
+      "dependsOn": [
+        "[variables('lbId')]",
+        "[variables('lbNatId')]"
+       ],
       "plan": {
         "name": "docker-ce-edge",
         "product": "docker-ce-edge",
@@ -235,7 +339,7 @@
                       "properties": {
                         "loadBalancerBackendAddressPools": [
                           {
-                            "id": "[parameters('bePoolId')]"
+                            "id": "[variables('lbBePoolId')]"
                           }
                         ],
                         "subnet": {

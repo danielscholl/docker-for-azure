@@ -287,20 +287,6 @@
       }
     },
     {
-      "name": "TemplateLoadBalancer",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "dependsOn": [],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployLoadBalancer.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {}
-      }
-    },
-    {
       "name": "TemplateManagers",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2017-05-10",
@@ -308,8 +294,7 @@
         "TemplateStorage",
         "TemplateLogStorage",
         "TemplateVNet",
-        "TemplateKeyVault",
-        "TemplateLoadBalancer"
+        "TemplateKeyVault"
       ],
       "properties": {
         "mode": "Incremental",
@@ -345,18 +330,6 @@
           },
           "subnetId": {
             "value": "[reference('TemplateVNet').outputs.subnets.value.subnetId]"
-          },
-          "lbName": {
-            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.name]"
-          },
-          "lbIp": {
-            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.ip]"
-          },
-          "natPoolId": {
-            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.poolId]"
-          },
-          "bePoolId": {
-            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.bePoolId]"
           },
           "adminUserName": {
             "reference": {
