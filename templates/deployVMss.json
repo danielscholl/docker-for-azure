@@ -254,11 +254,6 @@
                             "id": "[variables('lbBePoolId')]"
                           }
                         ],
-                        "loadBalancerInboundNatPools": [
-                          {
-                            "id": "[variables('lbNatPoolId')]"
-                          }
-                        ],
                         "subnet": {
                           "id": "[parameters('subnetId')]"
                         }
