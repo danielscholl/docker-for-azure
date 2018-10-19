@@ -23,6 +23,9 @@
     }
   },
   "variables": {
+    "prefix": "dks",
+    "channelTag": "edge",
+    "providerTag": "8CF0E79C-DF97-4992-9B59-602DB544D354",
     "lbIpName": "[concat(variables('lbName'), '-ip')]",
     "lbIpDnsName": "[concat('applb-', uniqueString(resourceGroup().id))]",
     "lbName": "[concat(resourceGroup().name, '-lb')]",
@@ -31,8 +34,24 @@
     "lbNatName": "[concat(resourceGroup().name, '-nat')]",
     "lbNatId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbNatName'))]",
     "lbNatPoolId": "[concat(variables('lbNatId'),'/inboundNatPools/default')]",
+    "lbNatBePoolId": "[concat(variables('lbNatId'),'/backendAddressPools/default')]",
     "lbNatFeIpConfigId": "[concat(variables('lbNatId'),'/frontendIPConfigurations/default')]",
-    "lbNatIpName": "[concat(variables('lbNatName'), '-ip')]"
+    "lbNatIpName": "[concat(variables('lbNatName'), '-ip')]",
+    "workerNamePrefix": "swarm-worker",
+    "managerNamePrefix": "swarm-manager",
+    "workerName": "[concat(variables('workerNamePrefix'), '-vmss')]",
+    "managerName": "[concat(variables('managerNamePrefix'), '-vmss')]",
+    "linuxImageOffer": "docker-ce-edge",
+    "linuxImagePublisher": "docker",
+    "linuxImageReference": {
+      "offer": "[variables('linuxImageOffer')]",
+      "publisher": "[variables('linuxImagePublisher')]",
+      "sku": "[variables('linuxImageSku')]",
+      "version": "[variables('linuxImageVersion')]"
+    },
+    "linuxImageSku": "docker-ce-edge",
+    "linuxImageVersion": "1.0.7",
+    "sshKeyPath": "[concat('/home/', parameters('adminUsername'), '/.ssh/authorized_keys')]"
   },
   "resources": [
     {
@@ -45,15 +64,11 @@
           "domainNameLabel": "[variables('lbIpDnsName')]"
         },
         "publicIPAllocationMethod": "Static"
-      }
-    },
-    {
-      "type": "Microsoft.Network/publicIPAddresses",
-      "apiVersion": "2016-03-30",
-      "name": "[variables('lbNatIpName')]",
-      "location": "[resourceGroup().location]",
-      "properties": {
-        "publicIPAllocationMethod": "Static"
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "[variables('prefix')]"
       }
     },
     {
@@ -91,6 +106,25 @@
             }
           }
         ]
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "[variables('prefix')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2016-03-30",
+      "name": "[variables('lbNatIpName')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Static"
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "[variables('prefix')]"
       }
     },
     {
@@ -142,21 +176,25 @@
             }
           }
         ]
+      },
+      "tags": {
+        "channelTag": "[variables('channelTag')]",
+        "provider": "[toUpper(variables('providerTag'))]",
+        "initials": "[variables('prefix')]"
       }
     },
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "apiVersion": "2017-03-30",
-      "name": "swarm-manager-vmss",
+      "name": "[variables('managerName')]",
       "location": "[resourceGroup().location]",
       "dependsOn": [
-        "[variables('lbId')]",
         "[variables('lbNatId')]"
       ],
       "plan": {
-        "name": "docker-ce-edge",
-        "product": "docker-ce-edge",
-        "publisher": "docker"
+        "name": "[variables('linuxImageSku')]",
+        "product": "[variables('linuxImageOffer')]",
+        "publisher": "[variables('linuxImagePublisher')]"
       },
       "properties": {
         "overprovision": false,
@@ -176,88 +214,7 @@
                       "properties": {
                         "loadBalancerBackendAddressPools": [
                           {
-                            "id": "[variables('lbBePoolId')]"
-                          }
-                        ],
-                        "subnet": {
-                          "id": "[parameters('subnetId')]"
-                        }
-                      }
-                    }
-                  ],
-                  "primary": true
-                }
-              }
-            ]
-          },
-          "osProfile": {
-            "adminUsername": "docker",
-            "computerNamePrefix": "swarm-manager-vmss",
-            "linuxConfiguration": {
-              "disablePasswordAuthentication": true,
-              "ssh": {
-                "publicKeys": [
-                  {
-                    "keyData": "[parameters('sshKey')]",
-                    "path": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]"
-                  }
-                ]
-              }
-            }
-          },
-          "storageProfile": {
-            "imageReference": {
-              "offer": "docker-ce-edge",
-              "publisher": "docker",
-              "sku": "docker-ce-edge",
-              "version": "1.0.7"
-            },
-            "osDisk": {
-              "caching": "ReadWrite",
-              "createOption": "FromImage"
-            }
-          }
-        }
-      },
-      "sku": {
-        "capacity": 2,
-        "name": "Standard_D1_v2",
-        "tier": "Standard"
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "apiVersion": "2017-03-30",
-      "name": "swarm-worker-vmss",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[variables('lbId')]",
-        "[variables('lbNatId')]"
-       ],
-      "plan": {
-        "name": "docker-ce-edge",
-        "product": "docker-ce-edge",
-        "publisher": "docker"
-      },
-      "properties": {
-        "overprovision": false,
-        "upgradePolicy": {
-          "mode": "Manual"
-        },
-        "virtualMachineProfile": {
-          "networkProfile": {
-            "networkInterfaceConfigurations": [
-              {
-                "name": "workerNodeNic",
-                "properties": {
-                  "ipConfigurations": [
-                    {
-                      "name": "nicipconfig",
-                      "privateIPAllocationMethod": "dynamic",
-                      "properties": {
-                        "loadBalancerBackendAddressPools": [
-                          {
-                            "id": "[variables('lbBePoolId')]"
+                            "id": "[variables('lbNatBePoolId')]"
                           }
                         ],
                         "loadBalancerInboundNatPools": [
@@ -277,27 +234,22 @@
             ]
           },
           "osProfile": {
-            "adminUsername": "docker",
-            "computerNamePrefix": "swarm-worker-vmss",
+            "adminUsername": "[parameters('adminUsername')]",
+            "computerNamePrefix": "[variables('managerName')]",
             "linuxConfiguration": {
               "disablePasswordAuthentication": true,
               "ssh": {
                 "publicKeys": [
                   {
                     "keyData": "[parameters('sshKey')]",
-                    "path": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]"
+                    "path": "[variables('sshKeyPath')]"
                   }
                 ]
               }
             }
           },
           "storageProfile": {
-            "imageReference": {
-              "offer": "docker-ce-edge",
-              "publisher": "docker",
-              "sku": "docker-ce-edge",
-              "version": "1.0.7"
-            },
+            "imageReference": "[variables('linuxImageReference')]",
             "osDisk": {
               "caching": "ReadWrite",
               "createOption": "FromImage"
@@ -306,8 +258,83 @@
         }
       },
       "sku": {
-        "capacity": 2,
-        "name": "Standard_D1_v2",
+        "capacity": 3,
+        "name": "Standard_D2_v2",
+        "tier": "Standard"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2017-03-30",
+      "name": "[variables('workerName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[variables('lbId')]"
+      ],
+      "plan": {
+        "name": "[variables('linuxImageSku')]",
+        "product": "[variables('linuxImageOffer')]",
+        "publisher": "[variables('linuxImagePublisher')]"
+      },
+      "properties": {
+        "overprovision": false,
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "workerNodeNic",
+                "properties": {
+                  "ipConfigurations": [
+                    {
+                      "name": "nicipconfig",
+                      "privateIPAllocationMethod": "dynamic",
+                      "properties": {
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[ variables('lbBePoolId')]"
+                          }
+                        ],
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        }
+                      }
+                    }
+                  ],
+                  "primary": true
+                }
+              }
+            ]
+          },
+          "osProfile": {
+            "adminUsername": "[parameters('adminUsername')]",
+            "computerNamePrefix": "[variables('workerName')]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "keyData": "[parameters('sshKey')]",
+                    "path": "[variables('sshKeyPath')]"
+                  }
+                ]
+              }
+            }
+          },
+          "storageProfile": {
+            "imageReference": "[variables('linuxImageReference')]",
+            "osDisk": {
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
+            }
+          }
+        }
+      },
+      "sku": {
+        "capacity": 3,
+        "name": "Standard_D2_v2",
         "tier": "Standard"
       }
     }
