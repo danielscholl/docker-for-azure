@@ -206,7 +206,7 @@
             ]
           },
           "osProfile": {
-            "computerNamePrefix": "[variables('name')]",
+            "computerNamePrefix": "[variables('manager')]",
             "adminUsername": "[parameters('adminUserName')]",
             "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', variables('role'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
             "linuxConfiguration": {
@@ -294,7 +294,7 @@
             ]
           },
           "osProfile": {
-            "computerNamePrefix": "[variables('name')]",
+            "computerNamePrefix": "[variables('worker')]",
             "adminUsername": "[parameters('adminUserName')]",
             "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', variables('role'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
             "linuxConfiguration": {
