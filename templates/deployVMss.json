@@ -98,9 +98,6 @@
     }
   },
   "variables": {
-    
-    
-
     "lbIpName": "[concat(variables('lbName'), '-ip')]",
     "lbIpDnsName": "[concat('applb-', uniqueString(resourceGroup().id))]",
     "lbName": "[concat(resourceGroup().name, '-lb')]",
@@ -108,6 +105,7 @@
     "lbBePoolId": "[concat(variables('lbId'),'/backendAddressPools/default')]",
     "lbNatName": "[concat(resourceGroup().name, '-nat')]",
     "lbNatId": "[resourceId('Microsoft.Network/loadBalancers',variables('lbNatName'))]",
+    "lbNatPoolId": "[concat(variables('lbNatId'),'/inboundNatPools/default')]",
     "lbNatFeIpConfigId": "[concat(variables('lbNatId'),'/frontendIPConfigurations/default')]",
     "lbNatIpName": "[concat(variables('lbNatName'), '-ip')]"
   },
@@ -258,7 +256,7 @@
                         ],
                         "loadBalancerInboundNatPools": [
                           {
-                            "id": "[variables('lbNatId')]"
+                            "id": "[variables('lbNatPoolId')]"
                           }
                         ],
                         "subnet": {
