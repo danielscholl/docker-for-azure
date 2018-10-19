@@ -123,8 +123,8 @@ LINUX_USER=(${AZURE_USER//@/ })
 CreateSSHKeys $AZURE_USER
 
 
-tput setaf 2; echo 'Accepting Marketplace Terms and Conditions...' ; tput sgr0
-AcceptTC "docker-ce-edge"
+# tput setaf 2; echo 'Accepting Marketplace Terms and Conditions...' ; tput sgr0
+# AcceptTC "docker-ce-edge"
 
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi

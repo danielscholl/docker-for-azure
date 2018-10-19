@@ -6,7 +6,7 @@
       "type": "string",
       "metadata": {
         "description": "The principal to assign the role to"
-      }
+      }      
     },
     "builtInRoleType": {
       "type": "string",
@@ -17,13 +17,13 @@
       ],
       "metadata": {
         "description": "Built-in role to assign"
-      }
+      }      
     },
     "roleNameGuid": {
       "type": "string",
       "metadata": {
         "description": "A new GUID used to identify the role"
-      }
+      }      
     }
   },
   "variables": {
