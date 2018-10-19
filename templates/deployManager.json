@@ -122,8 +122,7 @@
     }
   },
   "variables": {
-    "manager": "swarm-manager-vmss",
-    "worker": "swarm-worker-vmss",
+    "name": "swarm-manager-vmss",
     "role": "MANAGER",
     "linuxImageOffer": "docker-ce-edge",
     "linuxImagePublisher": "docker",
@@ -138,7 +137,7 @@
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "apiVersion": "2017-03-30",
-      "name": "[variables('manager')]",
+      "name": "[variables('name')]",
       "location": "[resourceGroup().location]",
       "sku": {
         "capacity": "[parameters('count')]",
@@ -177,12 +176,12 @@
           "networkProfile": {
             "networkInterfaceConfigurations": [
               {
-                "name": "managerNodeNic",
+                "name": "nodeNic",
                 "properties": {
                   "primary": true,
                   "ipConfigurations": [
                     {
-                      "name": "mgripconfig",
+                      "name": "ipconfig",
                       "privateIPAllocationMethod": "dynamic",
                       "properties": {
                         "subnet": {
@@ -206,95 +205,7 @@
             ]
           },
           "osProfile": {
-            "computerNamePrefix": "[variables('manager')]",
-            "adminUsername": "[parameters('adminUserName')]",
-            "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', variables('role'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
-            "linuxConfiguration": {
-              "disablePasswordAuthentication": true,
-              "ssh": {
-                "publicKeys": [
-                  {
-                    "keyData": "[parameters('sshKey')]",
-                    "path": "[variables('sshKeyPath')]"
-                  }
-                ]
-              }
-            }
-          }
-        }
-      },
-      "tags": {
-        "channelTag": "[variables('channelTag')]",
-        "provider": "[toUpper(variables('providerTag'))]"
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachineScaleSets",
-      "apiVersion": "2017-03-30",
-      "name": "[variables('worker')]",
-      "location": "[resourceGroup().location]",
-      "sku": {
-        "capacity": "[parameters('count')]",
-        "name": "[parameters('size')]",
-        "tier": "Standard"
-      },
-      "plan": {
-        "name": "[variables('linuxImageSku')]",
-        "product": "[variables('linuxImageOffer')]",
-        "publisher": "[variables('linuxImagePublisher')]"
-      },
-      "properties": {
-        "overprovision": false,
-        "upgradePolicy": {
-          "mode": "Manual"
-        },
-        "virtualMachineProfile": {
-          "storageProfile": {
-            "imageReference": {
-              "offer": "[variables('linuxImageOffer')]",
-              "publisher": "[variables('linuxImagePublisher')]",
-              "sku": "[variables('linuxImageSku')]",
-              "version": "[variables('linuxImageVersion')]"
-            },
-            "osDisk": {
-              "createOption": "FromImage",
-              "diskSizeGB": 100
-            }
-          },
-          "diagnosticsProfile": {
-            "bootDiagnostics": {
-              "enabled": true,
-              "storageUri": "[concat('http://', parameters('storageAccount'), '.blob.core.windows.net')]"
-            }
-          },
-          "networkProfile": {
-            "networkInterfaceConfigurations": [
-              {
-                "name": "workerNodeNic",
-                "properties": {
-                  "primary": true,
-                  "ipConfigurations": [
-                    {
-                      "name": "nicipconfig",
-                      "privateIPAllocationMethod": "dynamic",
-                      "properties": {
-                        "subnet": {
-                          "id": "[parameters('subnetId')]"
-                        },
-                        "loadBalancerBackendAddressPools": [
-                          {
-                            "id": "[parameters('bePoolId')]"
-                          }
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          },
-          "osProfile": {
-            "computerNamePrefix": "[variables('worker')]",
+            "computerNamePrefix": "[variables('name')]",
             "adminUsername": "[parameters('adminUserName')]",
             "customData": "[base64(concat('#!/bin/bash', '\n',  'export ROLE=\"', variables('role'), '\"', '\n', 'export LB_IP=\"', parameters('lbIp'), '\"', '\n', variables('customData')))]",
             "linuxConfiguration": {
