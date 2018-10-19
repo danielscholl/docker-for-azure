@@ -122,7 +122,8 @@
     }
   },
   "variables": {
-    "name": "swarm-manager-vmss",
+    "manager": "swarm-manager-vmss",
+    "worker": "swarm-worker-vmss",
     "role": "MANAGER",
     "linuxImageOffer": "docker-ce-edge",
     "linuxImagePublisher": "docker",
@@ -137,7 +138,7 @@
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "apiVersion": "2017-03-30",
-      "name": "[variables('name')]",
+      "name": "[variables('manager')]",
       "location": "[resourceGroup().location]",
       "sku": {
         "capacity": "[parameters('count')]",
@@ -230,7 +231,7 @@
     {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "apiVersion": "2017-03-30",
-      "name": "[variables('name')]",
+      "name": "[variables('worker')]",
       "location": "[resourceGroup().location]",
       "sku": {
         "capacity": "[parameters('count')]",
