@@ -128,7 +128,7 @@ CreateSSHKeys $AZURE_USER
 
 tput setaf 2; echo 'Deploying ARM Template...' ; tput sgr0
 if [ -f ./params.json ]; then PARAMS="params.json"; else PARAMS="azuredeploy.parameters.json"; fi
-az deployment create --template-file azuredeploy_orig.json  \
+az deployment create --template-file testing.json  \
     --name "$INITIALS-swarm" \
     --location $AZURE_LOCATION \
     --parameters $PARAMS \
