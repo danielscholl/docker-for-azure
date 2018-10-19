@@ -232,33 +232,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "prefix": {
-            "value": "[parameters('random')]"
-          },
-          "storageAccountType": {
-            "value": "Standard_LRS"
-          }
-        }
-      }
-    },
-    {
-      "name": "TemplateStorage",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "resourceGroup": "[variables('defaultGroup')]",
-      "dependsOn": [
-        "[resourceId('Microsoft.Resources/resourceGroups/', variables('defaultGroup'))]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployStorageAccount.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "prefix": {
-            "value": "logs"
-          },
           "storageAccountType": {
             "value": "Standard_LRS"
           }
@@ -277,7 +250,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deploySwarm.json')]",
+          "uri": "[concat(parameters('templateURL'), 'deploySwarm2.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
