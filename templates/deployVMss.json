@@ -1,0 +1,294 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "servicePrincipalAppId": {
+      "metadata": {
+        "description": "AD ServicePrincipal App ID"
+      },
+      "type": "string"
+    },
+    "servicePrincipalAppSecret": {
+      "metadata": {
+        "description": "AD ServicePrincipal App Secret"
+      },
+      "type": "securestring"
+    },
+    "storageAccount": {
+      "metadata": {
+        "description": "Logs Storage Account Name"
+      },
+      "type": "string"
+    },
+    "subnetId": {
+      "metadata": {
+        "description": "Virtual Network Subnet Id"
+      },
+      "type": "string"
+    },
+    "lbName": {
+      "metadata": {
+        "description": "Load Balancer Name"
+      },
+      "type": "string"
+    },
+    "lbIP": {
+      "type": "string",
+      "metadata": {
+        "description": "Load Balancer IP"
+      }
+    },
+    "natPoolId": {
+      "metadata": {
+        "description": "Load Balancer Nat Pool ID"
+      },
+      "type": "string"
+    },
+    "bePoolId": {
+      "metadata": {
+        "description": "Load Balancer Backend Nat Pool ID"
+      },
+      "type": "string"
+    },
+    "size": {
+      "allowedValues": [
+        "Standard_A0",
+        "Standard_A1",
+        "Standard_A2",
+        "Standard_A3",
+        "Standard_A4",
+        "Standard_D1",
+        "Standard_D2",
+        "Standard_D3",
+        "Standard_D4",
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2",
+        "Standard_DS1",
+        "Standard_DS2",
+        "Standard_DS3",
+        "Standard_DS4",
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_D2s_v3",
+        "Standard_D4s_v3"
+      ],
+      "defaultValue": "Standard_D2_v2",
+      "metadata": {
+        "description": "The size of the Swarm manager VMs"
+      },
+      "type": "string"
+    },
+    "count": {
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Linux VMs"
+      },
+      "type": "int"
+    },
+    "adminUserName": {
+      "defaultValue": "docker",
+      "type": "string",
+      "metadata": {
+        "description": "User name for the Linux Virtual Machines."
+      }
+    },
+    "sshKey": {
+      "type": "string",
+      "metadata": {
+        "description": "The SSH public key used to authenticate with the created swarm. Usually available in $HOME/.ssh/id_rsa.pub file"
+      }
+    }
+  },
+  "variables": {},
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2017-03-30",
+      "name": "swarm-manager-vmss",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [ ],
+      "plan": {
+        "name": "docker-ce-edge",
+        "product": "docker-ce-edge",
+        "publisher": "docker"
+      },
+      "properties": {
+        "overprovision": false,
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "managerNodeNic",
+                "properties": {
+                  "ipConfigurations": [
+                    {
+                      "name": "mgripconfig",
+                      "privateIPAllocationMethod": "dynamic",
+                      "properties": {
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[parameters('bePoolId')]"
+                          }
+                        ],
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[parameters('natPoolId')]"
+                          }
+                        ],
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        }
+                      }
+                    }
+                  ],
+                  "primary": true
+                }
+              }
+            ]
+          },
+          "osProfile": {
+            "adminUsername": "docker",
+            "computerNamePrefix": "swarm-manager-vmss",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "keyData": "[parameters('sshKey')]",
+                    "path": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]"
+                  }
+                ]
+              }
+            }
+          },
+          "storageProfile": {
+            "imageReference": {
+              "offer": "docker-ce-edge",
+              "publisher": "docker",
+              "sku": "docker-ce-edge",
+              "version": "1.0.7"
+            },
+            "osDisk": {
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
+            }
+          }
+        }
+      },
+      "sku": {
+        "capacity": 2,
+        "name": "Standard_D1_v2",
+        "tier": "Standard"
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2017-03-30",
+      "name": "swarm-worker-vmss",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [ ],
+      "plan": {
+        "name": "docker-ce-edge",
+        "product": "docker-ce-edge",
+        "publisher": "docker"
+      },
+      "properties": {
+        "overprovision": false,
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "workerNodeNic",
+                "properties": {
+                  "ipConfigurations": [
+                    {
+                      "name": "nicipconfig",
+                      "privateIPAllocationMethod": "dynamic",
+                      "properties": {
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[parameters('bePoolId')]"
+                          }
+                        ],
+                        "subnet": {
+                          "id": "[parameters('subnetId')]"
+                        }
+                      }
+                    }
+                  ],
+                  "primary": true
+                }
+              }
+            ]
+          },
+          "osProfile": {
+            "adminUsername": "docker",
+            "computerNamePrefix": "swarm-worker-vmss",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "keyData": "[parameters('sshKey')]",
+                    "path": "[concat('/home/', parameters('adminUserName'), '/.ssh/authorized_keys')]"
+                  }
+                ]
+              }
+            }
+          },
+          "storageProfile": {
+            "imageReference": {
+              "offer": "docker-ce-edge",
+              "publisher": "docker",
+              "sku": "docker-ce-edge",
+              "version": "1.0.7"
+            },
+            "osDisk": {
+              "caching": "ReadWrite",
+              "createOption": "FromImage"
+            }
+          }
+        }
+      },
+      "sku": {
+        "capacity": 2,
+        "name": "Standard_D1_v2",
+        "tier": "Standard"
+      }
+    }
+  ],
+  "outputs": {
+    "SSH Targets": {
+      "type": "string",
+      "value": "[concat('https://portal.azure.com', '/#resource/subscriptions/', subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Network/loadBalancers/', variables('lbNatName'), '/inboundNatRules')]"
+    }
+  }
+}

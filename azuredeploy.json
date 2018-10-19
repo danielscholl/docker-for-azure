@@ -314,7 +314,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(parameters('templateURL'), 'deployManager.json')]",
+          "uri": "[concat(parameters('templateURL'), 'deployVMss.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
