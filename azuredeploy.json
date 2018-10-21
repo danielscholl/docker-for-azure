@@ -317,11 +317,11 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "name": {
-            "value": "swarm-manager-vmss"
+          "size": {
+            "value": "[parameters('managerSize')]"
           },
-          "swarmRole": {
-            "value": "MANAGER"
+          "count": {
+            "value": "[parameters('managerCount')]"
           },
           "servicePrincipalAppId": {
             "reference": {
@@ -339,7 +339,7 @@
               "secretName": "clientSecret"
             }
           },
-          "logStorageAccount": {
+          "storageAccount": {
             "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
           },
           "swarmInfoStorageAccount": {
@@ -360,12 +360,6 @@
           "natPoolId": {
             "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.bePoolId]"
           },
-          "size": {
-            "value": "[parameters('managerSize')]"
-          },
-          "count": {
-            "value": "[parameters('managerCount')]"
-          },
           "adminUserName": {
             "reference": {
               "keyVault": {
@@ -383,7 +377,6 @@
             }
           }
         }
-
       }
     },
     {
@@ -395,7 +388,8 @@
         "TemplateLogStorage",
         "TemplateVNet",
         "TemplateKeyVault",
-        "TemplateLoadBalancer"
+        "TemplateLoadBalancer",
+        "TemplateManagers"
       ],
       "properties": {
         "mode": "Incremental",
