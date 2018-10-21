@@ -342,9 +342,6 @@
           "storageAccount": {
             "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
           },
-          "swarmInfoStorageAccount": {
-            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
-          },
           "subnetId": {
             "value": "[reference('TemplateVNet').outputs.subnets.value.subnetId]"
           },
@@ -355,10 +352,10 @@
             "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.ip]"
           },
           "bePoolId": {
-            "value": "[reference('TemplateLoadBalancer').outputs.loadBalancer.value.bePoolId]"
+            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.bePoolId]"
           },
           "natPoolId": {
-            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.bePoolId]"
+            "value": "[reference('TemplateLoadBalancer').outputs.natLoadBalancer.value.natPoolId]"
           },
           "adminUserName": {
             "reference": {
