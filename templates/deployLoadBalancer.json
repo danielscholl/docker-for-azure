@@ -147,7 +147,8 @@
       "value": {
         "id": "[variables('LBId')]",
         "name": "[variables('LBName')]",
-        "ip":"[reference(variables('lbIpName')).ipAddress]"
+        "bePoolId": "[concat(variables('LBId'),'/backendAddressPools/default')]",
+        "ip": "[reference(variables('lbIpName')).ipAddress]"
       }
     },
     "natLoadBalancer": {
