@@ -158,7 +158,7 @@
             },
             "osDisk": {
               "createOption": "FromImage",
-              "diskSizeGB": 200
+              "diskSizeGB": 100
             }
           },
           "diagnosticsProfile": {

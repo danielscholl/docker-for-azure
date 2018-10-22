@@ -163,8 +163,7 @@
               "version": "[variables('linuxImageVersion')]"
             },
             "osDisk": {
-              "createOption": "FromImage",
-              "diskSizeGB": 200
+              "createOption": "FromImage"
             }
           },
           "diagnosticsProfile": {
