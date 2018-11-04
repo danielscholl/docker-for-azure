@@ -53,18 +53,6 @@
       "metadata": {
         "description": "Storage Account Key"
       }
-    },
-    "logAccountName": {
-      "type": "string",
-      "metadata": {
-        "description": "Storage Account Name"
-      }
-    },
-    "logAccountKey": {
-      "type": "securestring",
-      "metadata": {
-        "description": "Storage Account Key"
-      }
     }
   },
   "variables": {
@@ -171,17 +159,6 @@
           "apiVersion": "2018-02-14",
           "properties": {
             "value": "[parameters('storageAccountKey')]"
-          },
-          "dependsOn": [
-            "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
-          ]
-        },
-        {
-          "type": "secrets",
-          "name": "[parameters('logAccountName')]",
-          "apiVersion": "2018-02-14",
-          "properties": {
-            "value": "[parameters('logAccountKey')]"
           },
           "dependsOn": [
             "[resourceId('Microsoft.KeyVault/vaults', variables('keyVaultName'))]"
