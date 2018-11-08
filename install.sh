@@ -16,7 +16,7 @@ if [ -f ./.envrc ]; then source ./.envrc; fi
 
 if [ ! -z $1 ]; then INITIALS=$1; fi
 if [ -z $INITIALS ]; then
-  INITIALS="iac"
+  INITIALS="demo"
 fi
 
 if [ -z $AZURE_LOCATION ]; then

@@ -1,0 +1,27 @@
+- azdtr.py  
+    - Storage to Cosmos
+    - Remove Storage Keys Request
+    - Use create_table_service method
+- aznodewatch.py 
+    - Storage to Cosmos 
+    - Remove Storage Keys Request
+    - Use create_table_service method
+- azparameters.py
+    - Storage to Cosmos
+- azrejoin.py
+    - Storage to Cosmos
+    - Remove Storage Keys Request
+    - Use create_table_service method
+- azupg_listener.py
+    - Storage to Cosmos
+    - Remove Storage Keys Request
+    - Use create_table_service method
+- azutils.py
+    - Storage to Cosmos
+- dockerutils.py
+    - Overprovisioned Nodes
+- sakey.py
+    - Storage to Comos
+    - Import from azservices get_storage_account_key
+- azservices.py
+    - Brand New File

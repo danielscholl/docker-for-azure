@@ -276,12 +276,6 @@
           },
           "storageAccountKey": {
             "value": "[reference('TemplateStorage').outputs.storageAccount.value.key]"
-          },
-          "logAccountName": {
-            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.name]"
-          },
-          "logAccountKey": {
-            "value": "[reference('TemplateLogStorage').outputs.storageAccount.value.key]"
           }
         }
       }
